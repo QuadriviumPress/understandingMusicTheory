@@ -32,7 +32,7 @@ A melody that rises and falls quickly, with large [intervals](ch-32-interval.md)
 
 ![Three labelled melodies illustrating conjunct stepwise motion, disjunct leaps, and a mixture of both types of melodic motion.](../images/notation/conjunct-disjunct-and-mixed-motion.svg)
 
-A melody may show conjuct motion, with small changes in pitch from one note to the next, or disjunct motion, with large leaps. Many melodies are an interesting, fairly balanced mixture of conjunct and disjunct motion.
+A melody may show conjunct motion, with small changes in pitch from one note to the next, or disjunct motion, with large leaps. Many melodies are an interesting, fairly balanced mixture of conjunct and disjunct motion.
 
 ## Melodic Phrases
 

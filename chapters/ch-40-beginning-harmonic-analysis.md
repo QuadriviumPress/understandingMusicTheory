@@ -138,7 +138,7 @@ As mentioned above, the \"flavor\" of sound that is created by a major chord wit
 >
 > > **Solution**
 > >
-> > The seventh degree of the scale must be raised by one half step to make the v chord major. If the seventh scale note is raised, the III chord becomes augmented, and and the vii chord becomes a diminished chord (based on the sharp vii rather than the vii). The augmented III chord would not be particularly useful in the key, but, as mentioned above, a diminished seventh chord based on the leading tone (here, the sharp vii) is sometimes used in [cadences](ch-41-cadence.md).
+> > The seventh degree of the scale must be raised by one half step to make the v chord major. If the seventh scale note is raised, the III chord becomes augmented, and the vii chord becomes a diminished chord (based on the sharp vii rather than the vii). The augmented III chord would not be particularly useful in the key, but, as mentioned above, a diminished seventh chord based on the leading tone (here, the sharp vii) is sometimes used in [cadences](ch-41-cadence.md).
 > >
 > > ![Music notation example](../images/cnx/018eaacd044b0ae816385df52c97804730172e7c.png)
 > >

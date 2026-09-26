@@ -12,7 +12,7 @@ source: "https://github.com/cnx-user-books/cnxbook-understanding-basic-music-the
 
 ## What is Meter?
 
-The *meter* of a piece of music is the arrangment of its rhythms in a repetitive pattern of strong and weak beats. This does not necessarily mean that the rhythms themselves are repetitive, but they do strongly suggest a repeated pattern of pulses. It is on these pulses, the [beat](ch-08-time-signature.md) of the music, that you tap your foot, clap your hands, dance, etc.
+The *meter* of a piece of music is the arrangement of its rhythms in a repetitive pattern of strong and weak beats. This does not necessarily mean that the rhythms themselves are repetitive, but they do strongly suggest a repeated pattern of pulses. It is on these pulses, the [beat](ch-08-time-signature.md) of the music, that you tap your foot, clap your hands, dance, etc.
 
 Some music does not have a meter. Ancient music, such as Gregorian chants; new music, such as some experimental twentieth-century art music; and Non-Western music, such as some native American flute music, may not have a strong, repetitive pattern of beats. Other types of music, such as traditional Western African drumming, may have very complex meters that can be difficult for the beginner to identify.
 

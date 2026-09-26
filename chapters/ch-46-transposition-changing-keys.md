@@ -89,7 +89,7 @@ Before you can begin transposing, you must decide what your new [key](ch-30-majo
 
 ### Working with Vocalists
 
-If you are trying to accomodate singers, your main concern in choosing a key is finding their [range](ch-23-range.md). Is the music you are working with too high or too low? Is it only a step too high, or does it need to be changed by a third or a fifth? Once you determine the [interval](ch-32-interval.md) needed, check to make certain this will be a comfortable key for your instrumentalists.
+If you are trying to accommodate singers, your main concern in choosing a key is finding their [range](ch-23-range.md). Is the music you are working with too high or too low? Is it only a step too high, or does it need to be changed by a third or a fifth? Once you determine the [interval](ch-32-interval.md) needed, check to make certain this will be a comfortable key for your instrumentalists.
 
 > **Example**
 >
