@@ -94,7 +94,7 @@ It can be difficult to follow a discussion of music without hearing some example
 ### Non-Western Folk
 
 - If you live in a Western culture, it can be difficult to find recordings of non-Western folk music, since most Western listeners do not have a taste for it. For children, Wee Sing publishes an \"Around the World\" book and tape with children\'s songs from all over.
-- The Music for Little People catalogue also has some recordings that introduce children to music from other cultures.
+- The Music for Little People catalog also has some recordings that introduce children to music from other cultures.
 - For adults, Ellipsis Arts publishes traditional music from non-Western cultures. Check your local library\'s recording section for music from Africa or Asia, or for the music of native Americans or Australians.
 - Some of the Rough Guide series focus on specific folk or traditional musics.
 

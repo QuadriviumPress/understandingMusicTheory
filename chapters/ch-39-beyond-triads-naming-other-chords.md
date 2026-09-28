@@ -35,7 +35,7 @@ Some instrumentalists, such as guitarists and pianists, are sometimes expected t
 
 A chord symbol above the staff is sometimes the only indication of which notes should be used in the <a href="ch-21-harmony.md">accompaniment</a>. Chord symbols also may be used even when an accompaniment is written out, so that performers can read either the chord symbol or the notated music, as they prefer.
 
-There is widespread agreement on how to name chords, but there are several different systems for writing chord symbols. Unfortunately, this can be a little confusing, particularly when different systems use the same symbol to refer to different chords. If you\'re not certain what chord is wanted, you can get useful clues both from the notes in the music and from the other chord symbols used. (For example, if the \"minus\" chord symbol is used, check to see if you can spot any chords that are clearly labelled as either minor or diminished.)
+There is widespread agreement on how to name chords, but there are several different systems for writing chord symbols. Unfortunately, this can be a little confusing, particularly when different systems use the same symbol to refer to different chords. If you\'re not certain what chord is wanted, you can get useful clues both from the notes in the music and from the other chord symbols used. (For example, if the \"minus\" chord symbol is used, check to see if you can spot any chords that are clearly labeled as either minor or diminished.)
 
 ![Music notation example](../images/cnx/96d057cfd9c863b41dc745cf93c6ce8a64ff7ce6.png)
 
@@ -102,19 +102,19 @@ The first, third, and fifth (1, 3, and 5) notes of the scale are part of the bas
 
 ![Music notation example](../images/cnx/65a2c335b9fea23f93bf3d9153316a096c717a29.png)
 
-Labelling a number as "sus" (suspended) implies that it replaces the chord tone immediately below it. Labelling it "add" implies that only that note is added. In many other situations, the performer is left to decide how to play the chord most effectively. Chord tones may or may not be left out. In an extended chord, all or some of the notes in the "stack of thirds" below the named note may also be added.
+Labeling a number as "sus" (suspended) implies that it replaces the chord tone immediately below it. Labeling it "add" implies that only that note is added. In many other situations, the performer is left to decide how to play the chord most effectively. Chord tones may or may not be left out. In an extended chord, all or some of the notes in the "stack of thirds" below the named note may also be added.
 
 Many of the higher added notes are considered *extensions* of the \"stack of thirds\" begun in the triad. In other words, a C13 can include (it\'s sometimes the performer\'s decision which notes will actually be played) the seventh, ninth, and eleventh as well as the thirteenth. Such a chord can be dominant, major, or minor; the performer must take care to play the correct third and seventh. If a chord symbol says to \"add13\", on the other hand, this usually means that only the thirteenth is added.
 
 ![Music notation example](../images/cnx/a52102ca5ea2cc4b0026dcd4188cec9edc85a13e.png)
 
-Take care to use the correct third and seventh - dominant, major, or minor - with extended chords. If the higher note is labelled "add", don't include the chord extensions that aren't named.
+Take care to use the correct third and seventh - dominant, major, or minor - with extended chords. If the higher note is labeled "add", don't include the chord extensions that aren't named.
 
 > **Note**
 >
 > All added notes and extensions, including sevenths, introduce [dissonance](ch-38-consonance-and-dissonance.md) into the chord. In some modern music, many of these dissonances are heard as pleasant or interesting or jazzy and don\'t need to be resolved. However, in other styles of music, dissonances need to be [resolved](ch-38-consonance-and-dissonance.md), and some chords may be altered to make the dissonance sound less harsh (for example, by leaving out the 3 in a chord with a 4).
 
-You may have noticed that, once you pass the octave (8), you are repeating the scale. In other words, C2 and C9 both add a D, and C4 and C11 both add an F. It may seem that C4 and C11 should therefore be the same chords, but in practice these chords usually do sound different; for example, performers given a C4 chord will put the added note near the bass note and often use it as a temporary replacement for the third (the \"3\") of the chord. On the other hand, they will put the added note of a C11 at the top of the chord, far away from the bass note and piled up on top of all the other notes of the chord (including the third), which may include the 7 and 9 as well as the 11. The result is that the C11 - an *extension* - has a more diffuse, jazzy, or impressionistic sound. The C4, on the other hand, has a more intense, needs-to-be-resolved, classic *suspension* sound. In fact, 2, 4, and 9 chords are often labelled *suspended* (sus), and follow the same rules for [resolution](ch-38-consonance-and-dissonance.md) in popular music as they do in classical.
+You may have noticed that, once you pass the octave (8), you are repeating the scale. In other words, C2 and C9 both add a D, and C4 and C11 both add an F. It may seem that C4 and C11 should therefore be the same chords, but in practice these chords usually do sound different; for example, performers given a C4 chord will put the added note near the bass note and often use it as a temporary replacement for the third (the \"3\") of the chord. On the other hand, they will put the added note of a C11 at the top of the chord, far away from the bass note and piled up on top of all the other notes of the chord (including the third), which may include the 7 and 9 as well as the 11. The result is that the C11 - an *extension* - has a more diffuse, jazzy, or impressionistic sound. The C4, on the other hand, has a more intense, needs-to-be-resolved, classic *suspension* sound. In fact, 2, 4, and 9 chords are often labeled *suspended* (sus), and follow the same rules for [resolution](ch-38-consonance-and-dissonance.md) in popular music as they do in classical.
 
 ![Music notation example](../images/cnx/e4fa99218d125c95730f25437e9a42952b90ea81.png)
 

@@ -28,11 +28,11 @@ For example, the closer together those evenly-spaced waves are, the higher the n
 
 ## Longitudinal and Transverse Waves
 
-So what are we talking about when we speak of sound waves? Waves are disturbances; they are changes in something - the surface of the ocean, the air, electromagnetic fields. Normally, these changes are travelling (except for [standing waves](ch-26-standing-waves-and-musical-instruments.md)); the disturbance is moving away from whatever created it, in a kind of domino effect.
+So what are we talking about when we speak of sound waves? Waves are disturbances; they are changes in something - the surface of the ocean, the air, electromagnetic fields. Normally, these changes are traveling (except for [standing waves](ch-26-standing-waves-and-musical-instruments.md)); the disturbance is moving away from whatever created it, in a kind of domino effect.
 
 Most kinds of waves are *transverse* waves. In a transverse wave, as the wave is moving in one direction, it is creating a disturbance in a different direction. The most familiar example of this is waves on the surface of water. As the wave travels in one direction - say south - it is creating an up-and-down (not north-and-south) motion on the water\'s surface. This kind of wave is fairly easy to draw; a line going from left-to-right has up-and-down wiggles. (See the referenced item.)
 
-![Longitudinal compressions and a transverse sine wave both moving left to right; transverse peaks are labelled high and low.](../images/notation/transverse-and-longitudinal-waves.svg)
+![Longitudinal compressions and a transverse sine wave both moving left to right; transverse peaks are labeled high and low.](../images/notation/transverse-and-longitudinal-waves.svg)
 
 In water waves and other <em>transverse waves</em>, the ups and downs are in a different direction from the forward movement of the wave. The "highs and lows" of sound waves and other <em>longitudinal waves</em> are arranged in the "forward" direction.
 
@@ -52,7 +52,7 @@ The *amplitude* of the wave is a measure of the displacement: how big is the cha
 
 Musicians call the loudness of a note its *dynamic level*. *Forte* (pronounced \"FOR-tay\") is a loud dynamic level; *piano* is soft. Dynamic levels don\'t correspond to a measured decibel level. An orchestra playing \"fortissimo\" (which basically means \"even louder than forte\") is going to be quite a bit louder than a string quartet playing \"fortissimo\". (See [Dynamics](ch-15-dynamics-and-accents.md) for more of the terms that musicians use to talk about loudness.) Dynamics are more of a performance issue than a music theory issue, so amplitude doesn\'t need much discussion here.
 
-![Two waves of equal frequency: the larger-amplitude wave is labelled louder and the smaller-amplitude wave softer.](../images/notation/wave-amplitude-and-loudness.svg)
+![Two waves of equal frequency: the larger-amplitude wave is labeled louder and the smaller-amplitude wave softer.](../images/notation/wave-amplitude-and-loudness.svg)
 
 The size of a wave (how much it is "piled up" at the high points) is its <em>amplitude</em>. For sound waves, the bigger the amplitude, the louder the sound.
 
@@ -60,11 +60,11 @@ The size of a wave (how much it is "piled up" at the high points) is its <em>amp
 
 The aspect of evenly-spaced sound waves that really affects music theory is the spacing between the waves, the distance between, for example, one high point and the next high point. This is the *wavelength*, and it affects the [pitch](ch-03-pitch-sharp-flat-and-natural-notes.md) of the sound; the closer together the waves are, the higher the tone sounds.
 
-All sound waves are travelling at about the same speed - the speed of sound. So waves with a shorter wavelength arrive (at your ear, for example) more often (frequently) than longer waves. This aspect of a sound - how often a peak of a wave goes by, is called *frequency* by scientists and engineers. They measure it in *hertz*, which is how many peaks go by per second. People can hear sounds that range from about 20 to about 17,000 hertz.
+All sound waves are traveling at about the same speed - the speed of sound. So waves with a shorter wavelength arrive (at your ear, for example) more often (frequently) than longer waves. This aspect of a sound - how often a peak of a wave goes by, is called *frequency* by scientists and engineers. They measure it in *hertz*, which is how many peaks go by per second. People can hear sounds that range from about 20 to about 17,000 hertz.
 
 ![Short waves arrive more frequently and make a high sound; long waves arrive less frequently and make a low sound.](../images/notation/wavelength-frequency-and-pitch.svg)
 
-Since the sounds are travelling at about the same speed, the one with the shorter wavelength "waves" more frequently; it has a higher frequency, or pitch. In other words, it sounds higher.
+Since the sounds are traveling at about the same speed, the one with the shorter wavelength "waves" more frequently; it has a higher frequency, or pitch. In other words, it sounds higher.
 
 The word that musicians use for frequency is *pitch*. The shorter the wavelength, the higher the frequency, and the higher the pitch, of the sound. In other words, short waves sound high; long waves sound low. Instead of measuring frequencies, musicians [name the pitches](ch-02-clef.md) that they use most often. They might call a note \"middle C\" or \"second line G\" or \"the F sharp in the bass clef\". (See [Octaves and Diatonic Music](ch-28-octaves-and-the-major-minor-tonal-system.md) and [Tuning Systems](ch-44-tuning-systems.md) for more on naming specific frequencies.) These notes have frequencies (Have you heard of the \"A 440\" that is used as a tuning note?), but the actual frequency of a middle C can vary a little from one orchestra, piano, or performance, to another, so musicians usually find it more useful to talk about note names.
 

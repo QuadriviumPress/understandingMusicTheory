@@ -30,7 +30,7 @@ If a piece begins with a pickup measure, the final measure of the piece is short
 
 Any [phrase](ch-19-melody.md) of music (not just the first one) may begin someplace other than on a strong downbeat. All the notes before the first strong downbeat of any phrase are the *pickup notes* to that phrase.
 
-![Four labelled melodic phrases, each beginning with one or two red pickup notes before its downbeat.](../images/notation/four-phrases-with-pickups.svg)
+![Four labeled melodic phrases, each beginning with one or two red pickup notes before its downbeat.](../images/notation/four-phrases-with-pickups.svg)
 
 Any phrase may begin with pickup notes. Each of these four phrases begins with one or two pickup notes. (You may listen to the tune <a href="../images/cnx/64ddd1a13c185bd4a2cba065e29064ac94be0bf1.midi">here</a>; can you hear that the pickup notes lead to the stronger downbeat?)
 

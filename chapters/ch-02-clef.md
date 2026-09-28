@@ -14,11 +14,11 @@ source: "https://github.com/cnx-user-books/cnxbook-understanding-basic-music-the
 
 The first symbol that appears at the beginning of every music [staff](ch-01-the-staff.md) is a *clef symbol*. It is very important because it tells you which [note](ch-06-duration-note-lengths-in-written-music.md) (A, B, C, D, E, F, or G) is found on each line or space. For example, a *treble clef* symbol tells you that the second line from the bottom (the line that the symbol curls around) is \"G\". On any staff, the notes are always arranged so that the next letter is always on the next higher line or space. The last note letter, G, is always followed by another A.
 
-![A treble clef staff labelled with ascending note names from C through A above and below the staff.](../images/notation/treble-pitch-names.svg)
+![A treble clef staff labeled with ascending note names from C through A above and below the staff.](../images/notation/treble-pitch-names.svg)
 
 A *bass clef* symbol tells you that the second line from the top (the one bracketed by the symbol\'s dots) is F. The notes are still arranged in ascending order, but they are all in different places than they were in treble clef.
 
-![A bass clef staff labelled with ascending note names from E below the staff through C above it.](../images/notation/bass-pitch-names.svg)
+![A bass clef staff labeled with ascending note names from E below the staff through C above it.](../images/notation/bass-pitch-names.svg)
 
 ## Memorizing the Notes in Bass and Treble Clef
 

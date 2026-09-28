@@ -22,13 +22,13 @@ You can enjoy music without recognizing its form, of course. But understanding t
 
 ## Describing Form
 
-Musicians traditionally have two ways to describe the form of a piece of music. One way involves labelling each large section with a letter. The other way is to simply give a name to a form that is very common.
+Musicians traditionally have two ways to describe the form of a piece of music. One way involves labeling each large section with a letter. The other way is to simply give a name to a form that is very common.
 
-### Labelling Form With Letters
+### Labeling Form With Letters
 
-Letters can be used to label the form of any piece of music, from the simplest to the most complex. Each major section of the music is labelled with a letter; for example, the first section is the A section. If the second section (or third or fourth) is exactly the same as the first, it is also labelled A. If it is very much like the A section, but with some important differences, it can be labelled A\' (pronounced \"A prime\"). The A\' section can also show up later in the piece, or yet another variation of A, A\'\' (pronounced \"A double prime\") can show up, and so on.
+Letters can be used to label the form of any piece of music, from the simplest to the most complex. Each major section of the music is labeled with a letter; for example, the first section is the A section. If the second section (or third or fourth) is exactly the same as the first, it is also labeled A. If it is very much like the A section, but with some important differences, it can be labeled A\' (pronounced \"A prime\"). The A\' section can also show up later in the piece, or yet another variation of A, A\'\' (pronounced \"A double prime\") can show up, and so on.
 
-The first major section of the piece that is very different from A is labelled B, and other sections that are like it can be labelled B, B\', B\'\', and so on. Sections that are not like A or B are labelled C, and so on.
+The first major section of the piece that is very different from A is labeled B, and other sections that are like it can be labeled B, B\', B\'\', and so on. Sections that are not like A or B are labeled C, and so on.
 
 How do you recognize the sections? With familiar kinds of music, this is pretty easy. (See the referenced item for some examples of forms that will be familiar to most listeners.) With unfamiliar types of music, it can be more of a challenge. Whether the music is classical, modern, jazz, or pop, listen for repeated sections of music. Also, listen for big changes, in the [rhythm](ch-17-rhythm.md), [melody](ch-19-melody.md), [harmony](ch-21-harmony.md), [texture](ch-20-texture.md), and [timbre](ch-18-timbre.md). A new section that is not a repetition will usually have noticeable differences in more than one of these areas. For an excellent discussion of form, with plenty of chances to practice hearing the beginnings of new sections, please see Professor Brandt\'s [Sound Reasoning](https://cnx.org/content/col10214) course. In particular, [Musical Form](https://cnx.org/content/m11629) deals with recognizing when something new is being introduced (A/B instead of A only), and [Time\'s Effect on the Material](https://cnx.org/content/m11434) deals with recognizing when a section reappears changed (A\', B\', or A\'\').
 
@@ -53,11 +53,11 @@ Most folk and popular music features simple forms that encourage participation.
 > >
 > > Your answers will depend on the songs you choose. Check them with a teacher if you can. (Bring the music so the teacher can listen to it while checking your answers.)
 
-While discussing a piece of music in detail, musicians may also use letters to label smaller parts of the piece within larger sections, even down to labelling individual [phrases](ch-19-melody.md). For example, the song \"The Girl I Left Behind\" has many verses with no refrain, an A A\' A\'\'- type form. However, a look at the tune of one verse shows that within that overall form is an A A\' B A\'\' phrase structure.
+While discussing a piece of music in detail, musicians may also use letters to label smaller parts of the piece within larger sections, even down to labeling individual [phrases](ch-19-melody.md). For example, the song \"The Girl I Left Behind\" has many verses with no refrain, an A A\' A\'\'- type form. However, a look at the tune of one verse shows that within that overall form is an A A\' B A\'\' phrase structure.
 
 ![Music notation example](../images/cnx/b85aa9a9b2e69a6b04fc226f446dd47151f55b52.png)
 
-In detailed discussions of a piece of music, smaller sections, and even individual phrases, may also be labelled with letters, in order to discuss the piece in greater detail. The A A B A form of this verse is very common, found in verses of everything from folk to jazz to pop music. Verses of blues songs are more likely to have an A A' B form.
+In detailed discussions of a piece of music, smaller sections, and even individual phrases, may also be labeled with letters, in order to discuss the piece in greater detail. The A A B A form of this verse is very common, found in verses of everything from folk to jazz to pop music. Verses of blues songs are more likely to have an A A' B form.
 
 > **Practice**
 >

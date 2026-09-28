@@ -44,7 +44,7 @@ A *slur* is marked by a curved line joining any number of notes. When notes are 
 
 A [tie](ch-11-dots-ties-and-borrowed-divisions.md) looks like a slur, but it is between two notes that are the same pitch. **A tie is not really an articulation marking.** It is included here because it looks like one, which can cause confusion for beginners. When notes are tied together, they are played as if they are one single note that is the length of all the notes that are tied together. (Please see [Dots, Ties, and Borrowed Divisions](ch-11-dots-ties-and-borrowed-divisions.md).)
 
-![A three-four melody labelling slurs between different pitches in blue and ties between repeated pitches in red.](../images/notation/slurs-versus-ties.svg)
+![A three-four melody labeling slurs between different pitches in blue and ties between repeated pitches in red.](../images/notation/slurs-versus-ties.svg)
 
 A slur marking indicates no articulation - no break in the sound - between notes of different pitches. A tie is used between two notes of the same pitch. Since there is no articulation between them, they sound like a single note. The tied quarters here would sound exactly like a half note crossing the bar line. Like a note that crosses bar lines, the two-and-a-half-beat "note" in the fourth bar would be difficult to write without using a tie.
 

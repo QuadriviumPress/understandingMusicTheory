@@ -49,7 +49,7 @@ If the music is in a minor key, it will be in the [relative minor](ch-31-minor-k
 > >
 > > Write the key signatures asked for in the referenced item and name the major keys that they represent.
 > >
-> > ![Blank treble-clef measures labelled for writing three, four, and five flats and five and seven sharps.](../images/notation/key-signature-writing-practice.svg)
+> > ![Blank treble-clef measures labeled for writing three, four, and five flats and five and seven sharps.](../images/notation/key-signature-writing-practice.svg)
 > >
 >
 > > **Solution**

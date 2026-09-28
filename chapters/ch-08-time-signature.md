@@ -37,7 +37,7 @@ When music is organized into beats, it makes sense to write it down that way. In
 
 In most metered music, some of the beats are stronger (louder, more powerful, more noticeable, or busier), than others, and there is a regular pattern of stronger and weaker beats, for example, strong-weak-weak-strong-weak-weak, or strong-weak-strong-weak. So the beats are organized even further by grouping them into *bars*, or *measures*. (The two words mean the same thing.) For example, for music with a beat pattern of strong-weak-weak-strong-weak-weak, or 1-2-3-1-2-3, a measure would have three beats in it. The *time signature* tells you two things: how many beats there are in each measure, and what [type of note](ch-06-duration-note-lengths-in-written-music.md) gets a beat.
 
-![A three-four time signature labelled to show beats per measure and the note value receiving one beat.](../images/notation/time-signature-anatomy.svg)
+![A three-four time signature labeled to show beats per measure and the note value receiving one beat.](../images/notation/time-signature-anatomy.svg)
 
 This time signature means that there are three quarter notes (or any combination of notes that equals three quarter notes) in every measure. A piece with this time signature would be "in three four time" or just "in three four".
 

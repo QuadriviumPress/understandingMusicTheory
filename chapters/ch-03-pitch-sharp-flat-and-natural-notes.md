@@ -12,7 +12,7 @@ source: "https://github.com/cnx-user-books/cnxbook-understanding-basic-music-the
 
 The *pitch* of a note is how high or low it sounds. Pitch depends on the [frequency](ch-25-acoustics-for-music-theory.md) of the [fundamental](https://cnx.org/content/m11118#p1c) sound wave of the note. The higher the frequency of a sound wave, and the shorter its [wavelength](ch-25-acoustics-for-music-theory.md), the higher its pitch sounds. But musicians usually don\'t want to talk about wavelengths and frequencies. Instead, they just give the different pitches different letter names: A, B, C, D, E, F, and G. These seven letters name all the *natural* notes (on a keyboard, that\'s all the white keys) within one octave. (When you get to the eighth natural note, you start the next [octave](ch-28-octaves-and-the-major-minor-tonal-system.md) on another A.)
 
-![Two octaves of piano keys with the natural notes C D E F G A B labelled on the white keys.](../images/notation/piano-natural-notes.svg)
+![Two octaves of piano keys with the natural notes C D E F G A B labeled on the white keys.](../images/notation/piano-natural-notes.svg)
 
 The natural notes name the white keys on a keyboard.
 

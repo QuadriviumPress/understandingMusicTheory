@@ -30,7 +30,7 @@ Another set of useful terms describe how quickly a melody goes up and down. A me
 
 A melody that rises and falls quickly, with large [intervals](ch-32-interval.md) between one note and the next, is a *disjunct* melody. One may also speak of \"leaps\" in the melody. Many melodies are a mixture of conjunct and disjunct motion.
 
-![Three labelled melodies illustrating conjunct stepwise motion, disjunct leaps, and a mixture of both types of melodic motion.](../images/notation/conjunct-disjunct-and-mixed-motion.svg)
+![Three labeled melodies illustrating conjunct stepwise motion, disjunct leaps, and a mixture of both types of melodic motion.](../images/notation/conjunct-disjunct-and-mixed-motion.svg)
 
 A melody may show conjunct motion, with small changes in pitch from one note to the next, or disjunct motion, with large leaps. Many melodies are an interesting, fairly balanced mixture of conjunct and disjunct motion.
 

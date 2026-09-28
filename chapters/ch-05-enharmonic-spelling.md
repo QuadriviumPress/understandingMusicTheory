@@ -14,13 +14,13 @@ source: "https://github.com/cnx-user-books/cnxbook-understanding-basic-music-the
 
 In [common notation](ch-01-the-staff.md), any note can be [sharp, flat, or natural](ch-03-pitch-sharp-flat-and-natural-notes.md). A sharp symbol raises the [pitch](ch-03-pitch-sharp-flat-and-natural-notes.md) (of a natural note) by one [half step](ch-29-half-steps-and-whole-steps.md); a flat symbol lowers it by one half step.
 
-![D sharp, D flat, and D natural written on a treble staff with their accidental symbols labelled.](../images/notation/sharp-flat-natural.svg)
+![D sharp, D flat, and D natural written on a treble staff with their accidental symbols labeled.](../images/notation/sharp-flat-natural.svg)
 
 Why do we bother with these symbols? There are twelve pitches available within any [octave](ch-28-octaves-and-the-major-minor-tonal-system.md). We could give each of those twelve pitches its own name (A, B, C, D, E, F, G, H, I, J, K, and L) and its own line or space on a staff. But that would actually be fairly inefficient, because most music is in a particular [key](ch-30-major-keys-and-scales.md). And music that is in a [major](ch-30-major-keys-and-scales.md) or [minor](ch-31-minor-keys-and-scales.md) key will tend to use only seven of those twelve notes. So music is easier to read if it has only lines, spaces, and notes for the seven pitches it is (mostly) going to use, plus a way to write the occasional notes that are not in the key.
 
 This is basically what common notation does. There are only seven note names (A, B, C, D, E, F, G), and each line or space on a [staff](ch-01-the-staff.md) will correspond with one of those note names. To get all twelve pitches using only the seven note names, we allow any of these notes to be sharp, flat, or natural. Look at the notes on a keyboard.
 
-![A piano octave labelling white keys with natural notes and black keys with both sharp and flat names.](../images/notation/piano-sharp-flat-note-names.svg)
+![A piano octave labeling white keys with natural notes and black keys with both sharp and flat names.](../images/notation/piano-sharp-flat-note-names.svg)
 
 Seven of the twelve possible notes in each <a href="ch-28-octaves-and-the-major-minor-tonal-system.md">octave</a> are "natural" notes.
 

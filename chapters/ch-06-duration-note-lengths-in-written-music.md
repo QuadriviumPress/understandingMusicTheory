@@ -16,7 +16,7 @@ In standard notation, a single musical sound is written as a *note*. The two mos
 
 To find out the [pitch](ch-03-pitch-sharp-flat-and-natural-notes.md) of a written note, you look at the [clef](ch-02-clef.md) and the [key signature](ch-04-key-signature.md), then see what line or space the note is on. The higher a note sits on the [staff](ch-01-the-staff.md), the higher it sounds. To find out the duration of the written note, you look at the [tempo](ch-13-tempo.md) and the [time signature](ch-08-time-signature.md) and then see what the note looks like.
 
-![Hollow and filled noteheads with arrows labelling the head, stem, flag, and augmentation dot.](../images/notation/note-anatomy.svg)
+![Hollow and filled noteheads with arrows labeling the head, stem, flag, and augmentation dot.](../images/notation/note-anatomy.svg)
 
 All of the parts of a written note affect how long it lasts.
 

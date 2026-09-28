@@ -28,13 +28,13 @@ The first step in naming the interval is to find the distance between the notes 
 
 The *simple intervals* are one octave or smaller.
 
-![Eight written intervals above C, labelled prime through octave.](../images/notation/simple-intervals-prime-through-octave.svg)
+![Eight written intervals above C, labeled prime through octave.](../images/notation/simple-intervals-prime-through-octave.svg)
 
 If you like you can listen to each interval as written in the referenced item: [prime](../images/cnx/3b2373bdd65ba188732288dd3c8948d54e6b249b.midi), [second](../images/cnx/6276e3b2a8a52b86fd74a156bdfcc93b1b37f43e.midi), [third](../images/cnx/66c60ddddb5896b3475f74571d8cb6f5905d648e.midi), [fourth](../images/cnx/6c0dbeadb9377bb4919fe21f50606d7191674cc5.midi), [perfect fifth](../images/cnx/fifth.mid), [sixth](../images/cnx/5d0848e30fefd1d5a3e16077fbe1125fa4367032.midi), [seventh](../images/cnx/cec379ba0754fef82252f066afd837e272929486.midi), [octave](../images/cnx/octave.mid)
 
 *Compound intervals* are larger than an octave.
 
-![Compound intervals above C labelled ninth through twelfth.](../images/notation/compound-intervals-ninth-and-beyond.svg)
+![Compound intervals above C labeled ninth through twelfth.](../images/notation/compound-intervals-ninth-and-beyond.svg)
 
 Listen to the compound intervals in the referenced item: [ninth](../images/cnx/5805bd8e4413799bf8a7519d63279259ceb9d67d.midi), [tenth](../images/cnx/b38c3b8407676b1c514800c5229b6153b0689895.midi), [eleventh](../images/cnx/8ef8a32fda8d4feb41fd2249584bf5c1681524d7.midi).
 
@@ -44,12 +44,12 @@ Listen to the compound intervals in the referenced item: [ninth](../images/cnx/5
 > >
 > > Name the intervals.
 > >
-> > ![Six unlabelled written intervals for interval-number practice.](../images/notation/interval-number-practice.svg)
+> > ![Six unlabeled written intervals for interval-number practice.](../images/notation/interval-number-practice.svg)
 > >
 >
 > > **Solution**
 > >
-> > ![Six written intervals labelled third, fifth, octave, second, seventh, and fourth.](../images/notation/interval-number-answers.svg)
+> > ![Six written intervals labeled third, fifth, octave, second, seventh, and fourth.](../images/notation/interval-number-answers.svg)
 > >
 
 > **Practice**
@@ -125,7 +125,7 @@ Seconds, thirds, sixths, and sevenths can be *major intervals* or *minor interva
 > >
 > > Give the complete name for each interval.
 > >
-> > ![Eight unlabelled intervals for complete interval-name practice.](../images/notation/classify-major-minor-intervals-practice.svg)
+> > ![Eight unlabeled intervals for complete interval-name practice.](../images/notation/classify-major-minor-intervals-practice.svg)
 > >
 >
 > > **Solution**

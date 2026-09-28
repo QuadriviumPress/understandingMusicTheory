@@ -29,7 +29,7 @@ A typical choral arrangement divides women into higher and lower voices and men 
 - *Tenor* -- A high (adult) male voice
 - *Bass* -- A low (adult) male voice
 
-Arrangements for these four voices are labelled SATB (for Soprano Alto Tenor Bass). The ranges of the four voices overlap, but singers may find themselves straining or getting an unpleasant sound at the top or a weak sound at the bottom of their ranges. So although the full ranges of an alto and a soprano may look quite similar, the soprano gets a strong, clear sound on the higher notes, and the alto a strong, clear sound in the lower part of the range. But there are vocalists whose strong, best-sounding range falls in a distinctly different place from any of these four voices. The names for some of these ranges are:
+Arrangements for these four voices are labeled SATB (for Soprano Alto Tenor Bass). The ranges of the four voices overlap, but singers may find themselves straining or getting an unpleasant sound at the top or a weak sound at the bottom of their ranges. So although the full ranges of an alto and a soprano may look quite similar, the soprano gets a strong, clear sound on the higher notes, and the alto a strong, clear sound in the lower part of the range. But there are vocalists whose strong, best-sounding range falls in a distinctly different place from any of these four voices. The names for some of these ranges are:
 
 - *Coloratura Soprano* -- This is not really a different range from the soprano, but a coloratura soprano has a voice that is unusually high, light, and agile, even for a soprano.
 - *Mezzo-soprano* -- In between soprano and alto

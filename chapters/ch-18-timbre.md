@@ -16,14 +16,14 @@ Timbre is caused by the fact that each note from a musical instrument is a compl
 
 The harmonics at the beginning of each note - the *attack* - are especially important for timbre, so it is actually easier to identify instruments that are playing short notes with strong [articulations](ch-16-articulation.md) than it is to identify instruments playing long, smooth notes.
 
-The human ear and brain are capable of hearing and appreciating very small variations in timbre. A listener can hear not only the difference between an oboe and a flute, but also the difference between two different oboes. The general sound that one would expect of a type of instrument - a [trombone](https://cnx.org/content/m12602) for example - is usually called its *timbre* or *color*. Variations in timbre between specific instruments - two different trombones, for example, or two different trombone players, or the same trombone player using different types of sound in different pieces - may be called differences in timbre or color, or may be called differences in *tone* or in *tone quality*. Tone quality may refer specifically to \"quality\", as when a young trombonist is encouraged to have a \"fuller\" or \"more focussed\" tone quality, or it can refer neutrally to differences in sound, as when an orchestral trombonist is asked to play with a \"brassy\" tone quality in one passage and a \"mellow\" tone quality in another.
+The human ear and brain are capable of hearing and appreciating very small variations in timbre. A listener can hear not only the difference between an oboe and a flute, but also the difference between two different oboes. The general sound that one would expect of a type of instrument - a [trombone](https://cnx.org/content/m12602) for example - is usually called its *timbre* or *color*. Variations in timbre between specific instruments - two different trombones, for example, or two different trombone players, or the same trombone player using different types of sound in different pieces - may be called differences in timbre or color, or may be called differences in *tone* or in *tone quality*. Tone quality may refer specifically to \"quality\", as when a young trombonist is encouraged to have a \"fuller\" or \"more focused\" tone quality, or it can refer neutrally to differences in sound, as when an orchestral trombonist is asked to play with a \"brassy\" tone quality in one passage and a \"mellow\" tone quality in another.
 
 Many words are used to describe timbre. Some are somewhat interchangeable, and some may have slightly different meanings for different musicians, so no attempt will be made to provide definitions. Here are a few words commonly used to describe either timbre or tone quality.
 
 - Reedy
 - Brassy
 - Clear
-- Focussed or unfocussed
+- Focused or unfocused
 - Breathy (pronounced \"BRETH-ee\")
 - Rounded
 - Piercing

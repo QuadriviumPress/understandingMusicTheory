@@ -66,7 +66,7 @@ This is **the** skill you need for jazz. Blues, rock, and many [Non-Western](ch-
 - The exercises at the [petersax](http://www.petersax.com) site mentioned above would also be useful for the beginning improviser.
 - Listen to jazz often. Listen to the improvisers you admire, and if a particular solo really appeals to you, listen to it many times, find the notes on your instrument, and then try writing it down as accurately as you can. Many famous improvisers, when interviewed, mention how useful it was to them to learn from other soloists by *transcribing* their solos in this way.
 - Figure out how to play your favorite jazz (or blues or rock) *licks* (short [motives](ch-19-melody.md) that show up in many pieces in the same genre) on your instrument. Practice stringing them together in ways that make sense to you, but are different from what you\'ve heard. Add your own variations.
-- Find a teacher who is familiar with the type of improvisation you want to learn, join a jazz band, and/or get together with other musicians who also want to practise improvisation and take turns playing background/rhythm for each other.
+- Find a teacher who is familiar with the type of improvisation you want to learn, join a jazz band, and/or get together with other musicians who also want to practice improvisation and take turns playing background/rhythm for each other.
 
 ### Recognizing Intervals and Writing Music Down
 

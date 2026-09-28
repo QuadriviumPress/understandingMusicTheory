@@ -36,15 +36,15 @@ The notes in different octaves are so closely related that when musicians talk a
 
 But there are also two formal systems for naming the notes in a particular octave. Many musicians use *Helmholtz* notation. Others prefer *scientific pitch notation*, which simply labels the octaves with numbers, starting with C1 for the lowest C on a full-sized keyboard. Figure 3 shows the names of the octaves most commonly used in music.
 
-![Six octaves of C labelled with common, Helmholtz, and scientific octave names.](../images/notation/octave-naming-systems.svg)
+![Six octaves of C labeled with common, Helmholtz, and scientific octave names.](../images/notation/octave-naming-systems.svg)
 
 The octaves are named from one C to the next higher C. For example, all the notes in between "one line c" and "two line c" are "one line" notes.
 
-The octave below contra can be labelled CCC or Co; higher octaves can be labelled with higher numbers or more lines. Octaves are named from one C to the next higher C. For example, all the notes between \"great C\" and \"small C\" are \"great\". **One-line c is also often called \"middle C\". No other notes are called \"middle\", only the C.**
+The octave below contra can be labeled CCC or Co; higher octaves can be labeled with higher numbers or more lines. Octaves are named from one C to the next higher C. For example, all the notes between \"great C\" and \"small C\" are \"great\". **One-line c is also often called \"middle C\". No other notes are called \"middle\", only the C.**
 
 > **Example**
 >
-> ![Eight notes labelled in Helmholtz notation: g¹, f², f³, b, f, d¹, A, and BB, with a change from treble to bass clef.](../images/notation/helmholtz-octave-naming-example.svg)
+> ![Eight notes labeled in Helmholtz notation: g¹, f², f³, b, f, d¹, A, and BB, with a change from treble to bass clef.](../images/notation/helmholtz-octave-naming-example.svg)
 >
 > Each note is considered to be in the same octave as the C below it.
 >
@@ -71,7 +71,7 @@ You may be thinking \"OK, that\'s twelve notes; that still has nothing to do wit
 
 Now take a look at the piano keyboard. Only seven letter names are used to name notes: A, B, C, D, E, F, and G. The eighth note would, of course, be the next A, beginning the next octave. To name the other notes, the notes on the black piano keys, you have to use a [sharp or flat](ch-03-pitch-sharp-flat-and-natural-notes.md) sign.
 
-![One octave of piano keys from A through the next A, numbered one through eight, with black keys labelled by sharp and flat enharmonic names.](../images/notation/piano-key-names-with-sharps-and-flats.svg)
+![One octave of piano keys from A through the next A, numbered one through eight, with black keys labeled by sharp and flat enharmonic names.](../images/notation/piano-key-names-with-sharps-and-flats.svg)
 
 The white keys are the natural notes. Black keys can only be named using sharps or flats. The pattern repeats at the eighth tone of a scale, the octave.
 
