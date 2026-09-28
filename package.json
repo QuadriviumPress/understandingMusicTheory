@@ -4,6 +4,7 @@
   "private": true,
   "description": "A PWA-ready MyST edition of Catherine Schmidt-Jones's open music theory books.",
   "license": "MIT",
+  "packageManager": "npm@10.9.8",
   "engines": {
     "node": ">=22",
     "npm": ">=10 <11"
@@ -11,19 +12,19 @@
   "scripts": {
     "start": "myst start",
     "build": "myst build --html && node scripts/setup-pwa.mjs",
+    "verify": "node scripts/verify-book.mjs",
+    "check": "npm run verify && myst build --html --strict --check-links",
+    "test": "npm run check",
     "import:cnx": "python3 scripts/import-cnx.py",
     "notation:audit": "node scripts/audit-notation.mjs --write",
-    "notation:render": "node scripts/render-notation.mjs",
     "notation:check": "node scripts/check-notation.mjs",
-    "verify": "node scripts/verify-book.mjs",
-    "test": "npm run check",
-    "check": "npm run verify && myst build --html --strict"
+    "notation:render": "node scripts/render-notation.mjs"
   },
   "devDependencies": {
-    "jsdom": "30.1.1",
     "mystmd": "1.11.0",
     "sharp": "0.35.4",
-    "vexflow": "5.0.0",
-    "yaml": "2.9.1"
+    "yaml": "2.9.1",
+    "jsdom": "30.1.1",
+    "vexflow": "5.0.0"
   }
 }
