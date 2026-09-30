@@ -1,4 +1,4 @@
-import { drawStave } from '../figure-helpers.mjs';
+import { drawMeasures, drawStave, melody, noteX } from '../figure-helpers.mjs';
 
 const ink = '#222';
 const red = '#d32f2f';
@@ -169,25 +169,29 @@ export const definitions = [
     sources: ['d9d282a798bfcd3b0b60329222e1bc0c72659209.png'],
     output: 'amplitude-wavelength-and-displacement.svg',
     alt: 'A wave diagram marking amplitude, wavelength, zero-displacement crossings, and maximum-displacement peaks and troughs.',
-    width: 940,
-    height: 300,
+    width: 800,
+    height: 240,
     render({ overlay }) {
-      const axisY = 150;
-      overlay.line(45, axisY, 770, axisY, { stroke: ink, 'stroke-width': 2 });
-      wave(overlay, 95, axisY, 620, 70, 2.5, { 'stroke-width': 3 });
-      doubleArrow(overlay, 140, axisY, 140, 80, { stroke: ink, 'stroke-width': 2 });
-      overlay.text('Amplitude', 140, 58, { 'font-size': 21, 'text-anchor': 'middle' });
-      doubleArrow(overlay, 325, 64, 575, 64, { stroke: ink, 'stroke-width': 2 });
-      overlay.text('Wavelength', 450, 42, { 'font-size': 21, 'text-anchor': 'middle' });
-      [345, 595].forEach((x) => overlay.circle(x, axisY, 6, { fill: blue }));
-      overlay.text('No\ndisplacement', 535, 246, { fill: blue, 'font-size': 19, 'text-anchor': 'middle', 'data-line-height': 22 });
-      arrow(overlay, 505, 218, 345, axisY + 6, { stroke: blue, 'stroke-width': 2 });
-      arrow(overlay, 565, 218, 595, axisY + 6, { stroke: blue, 'stroke-width': 2 });
-      overlay.circle(655, 80, 6, { fill: red });
-      overlay.circle(529, 220, 6, { fill: red });
-      overlay.text('Maximum displacement', 755, 158, { fill: red, 'font-size': 19 });
-      arrow(overlay, 748, 143, 662, 84, { stroke: red, 'stroke-width': 2 });
-      arrow(overlay, 748, 168, 536, 216, { stroke: red, 'stroke-width': 2 });
+      const axisY = 105;
+      const amplitude = 62;
+      const x0 = 40;
+      const period = 145;
+      overlay.line(0, axisY, 580, axisY, { stroke: ink, 'stroke-width': 2 });
+      wave(overlay, x0, axisY, period * 3.5, amplitude, 3.5, { 'stroke-width': 2.4 });
+      doubleArrow(overlay, 76, axisY, 76, axisY - amplitude + 2, { stroke: ink, 'stroke-width': 2 });
+      overlay.text('Amplitude', 78, 38, { 'font-size': 18, 'text-anchor': 'middle' });
+      doubleArrow(overlay, 228, 45, 360, 45, { stroke: ink, 'stroke-width': 2 });
+      overlay.text('Wavelength', 290, 20, { 'font-size': 18, 'text-anchor': 'middle' });
+      [330, 402.5].forEach((x) => overlay.circle(x, axisY, 4.5, { fill: blue }));
+      overlay.text('No', 368, 192, { fill: blue, 'font-size': 18, 'text-anchor': 'middle' });
+      overlay.text('displacement', 428, 220, { fill: blue, 'font-size': 18, 'text-anchor': 'middle' });
+      arrow(overlay, 355, 172, 334, 114, { stroke: blue, 'stroke-width': 2 });
+      arrow(overlay, 385, 172, 404, 114, { stroke: blue, 'stroke-width': 2 });
+      overlay.circle(511, axisY - amplitude, 4.5, { fill: red });
+      overlay.circle(438.5, axisY + amplitude, 4.5, { fill: red });
+      overlay.text('Most displacement', 602, 128, { fill: red, 'font-size': 18 });
+      arrow(overlay, 598, 110, 522, 52, { stroke: red, 'stroke-width': 2 });
+      arrow(overlay, 598, 132, 452, 166, { stroke: red, 'stroke-width': 2 });
     },
   },
   {
@@ -238,25 +242,24 @@ export const definitions = [
     status: 'svg-overlay',
     sources: ['aa67fb155f2f0a86a459138ef2af6da96c5b86d0.png'],
     output: 'harmonic-series-standing-waves.svg',
-    alt: 'The first four standing-wave patterns: fundamental or first harmonic, then the first, second, and third overtones.',
-    width: 900,
-    height: 560,
+    alt: 'A string fixed at both ends vibrating as the fundamental (first harmonic) and as the first, second, and third overtones (second, third, and fourth harmonics), with one to four loops.',
+    width: 640,
+    height: 490,
     render({ overlay }) {
-      const labels = [
-        'Fundamental\n1st harmonic',
-        'First overtone\n2nd harmonic',
-        'Second overtone\n3rd harmonic',
-        'Third overtone\n4th harmonic',
-      ];
-      labels.forEach((label, index) => {
-        const y = 35 + index * 125;
-        overlay.text(label, 30, y + 35, { 'font-size': 20, 'font-weight': '700', 'data-line-height': 27 });
-        standingWave(overlay, 285, y, 575, 80, index + 1);
-        overlay.line(285, y, 285, y + 80, { stroke: '#666', 'stroke-width': 2 });
-        overlay.line(860, y, 860, y + 80, { stroke: '#666', 'stroke-width': 2 });
+      const waveRed = '#e8423a';
+      const waveBlue = '#3a74c2';
+      [195, 637].forEach((x) => overlay.line(x, 5, x, 405, { stroke: '#555', 'stroke-width': 2 }));
+      [[50, 1, 25], [128, 2, 25], [218, 3, 25], [342, 4, 24]].forEach(([centre, loops, amplitude]) => {
+        // The fundamental starts with red above; the overtones start with blue above.
+        const upper = loops === 1 ? waveRed : waveBlue;
+        const lower = loops === 1 ? waveBlue : waveRed;
+        wave(overlay, 197, centre, 438, amplitude, loops / 2, { stroke: upper, 'stroke-width': 2 });
+        wave(overlay, 197, centre, 438, amplitude, loops / 2, { stroke: lower, 'stroke-width': 2 }, Math.PI);
       });
-      overlay.text('And so on…', 30, 535, { 'font-size': 20, 'font-weight': '700' });
-      overlay.text('⋮', 575, 540, { 'font-size': 30, 'text-anchor': 'middle' });
+      [['Fundamental\n1st Harmonic', 50], ['First Overtone\n2nd Harmonic', 135], ['Second Overtone\n3rd Harmonic', 221], ['Third Overtone\n4th Harmonic', 307], ['And so on...', 393]].forEach(([text, y]) => {
+        overlay.text(text, 0, y, { 'font-size': 19, 'data-line-height': 29, fill: '#222' });
+      });
+      [415, 448, 480].forEach((y) => overlay.circle(378, y, 2, { fill: '#111' }));
     },
   },
   {
@@ -416,20 +419,26 @@ export const definitions = [
     status: 'svg-overlay',
     sources: ['d1156e89d761fd0b2c7989ae3f41998b094037e5.png'],
     output: 'instrument-length-wavelength-and-pitch.svg',
-    alt: 'Short, medium, and long wind instruments beside correspondingly short, medium, and long sound waves, illustrating higher to lower pitch.',
-    width: 900,
-    height: 520,
+    alt: 'A small, a medium, and a large recorder beside waves of short, medium, and long wavelength: the longer the instrument, the longer the wavelength and the lower the pitch.',
+    width: 625,
+    height: 505,
     render({ overlay }) {
-      const rows = [
-        { y: 80, length: 55, cycles: 7, label: 'Short instrument · short wavelength · high pitch' },
-        { y: 250, length: 90, cycles: 4, label: 'Medium instrument · medium wavelength' },
-        { y: 420, length: 135, cycles: 2, label: 'Long instrument · long wavelength · low pitch' },
-      ];
-      rows.forEach(({ y, length, cycles, label }) => {
-        instrumentIcon(overlay, 50, y - 30, length);
-        wave(overlay, 220, y, 620, 48, cycles, { 'stroke-width': 3 });
-        overlay.text(label, 530, y + 82, { 'font-size': 18, 'text-anchor': 'middle' });
-      });
+      // A recorder drawn along its own axis, then rotated into place.
+      const recorder = (cx, cy, length, width, angle, holes) => {
+        const transform = `rotate(${angle} ${cx} ${cy})`;
+        const [top, bottom] = [cy - length / 2, cy + length / 2];
+        overlay.path(`M ${cx - width / 2} ${top + 6} Q ${cx - width / 2} ${top} ${cx} ${top} Q ${cx + width / 2} ${top} ${cx + width / 2} ${top + 6} V ${bottom - 10} L ${cx + width * 0.8} ${bottom} H ${cx - width * 0.8} L ${cx - width / 2} ${bottom - 10} Z`, {
+          fill: 'white', stroke: '#111', 'stroke-width': 2.2, transform,
+        });
+        for (let hole = 0; hole < holes; hole += 1) overlay.circle(cx, top + length * (0.3 + hole * 0.08), 2.4, { fill: '#111', transform });
+      };
+      recorder(34, 50, 70, 12, -35, 0);
+      wave(overlay, 75, 58, 522, 32, 8, { stroke: '#111', 'stroke-width': 2 });
+      recorder(36, 180, 115, 15, -32, 6);
+      wave(overlay, 87, 203, 521, 35, 4, { stroke: '#111', 'stroke-width': 2 });
+      recorder(67, 385, 225, 20, 0, 6);
+      overlay.path('M 60 275 Q 45 262 32 282 Q 24 292 18 282', { fill: 'none', stroke: '#111', 'stroke-width': 1.6 });
+      wave(overlay, 95, 392, 527, 38, 2, { stroke: '#111', 'stroke-width': 2 });
     },
   },
   {
@@ -461,19 +470,15 @@ export const definitions = [
     status: 'svg-overlay',
     sources: ['6e98c07a7efbb518d9a08be043a9311988da9a98.png'],
     output: 'harmonic-frequency-waveforms.svg',
-    alt: 'Six equal-length waveforms labelled one through six, with frequency increasing in integer multiples of the fundamental.',
-    width: 760,
-    height: 680,
+    alt: 'Six sine waves of the same length containing one through six complete cycles, the frequencies of the first six harmonics.',
+    width: 612,
+    height: 665,
     render({ overlay }) {
-      overlay.text('Harmonic number', 28, 35, { 'font-size': 19, 'font-weight': '700' });
       for (let harmonic = 1; harmonic <= 6; harmonic += 1) {
-        const y = 90 + (harmonic - 1) * 105;
-        overlay.text(String(harmonic), 60, y + 7, { 'font-size': 22, 'font-weight': '700', 'text-anchor': 'middle' });
-        wave(overlay, 115, y, 595, 34, harmonic, { 'stroke-width': 2.5 });
+        const centre = 45 + (harmonic - 1) * 116;
+        overlay.text(String(harmonic), 0, centre + 7, { 'font-size': 20 });
+        wave(overlay, 50, centre, 558, 33, harmonic, { stroke: '#111', 'stroke-width': 2 });
       }
-      overlay.text('Each harmonic has an integer multiple of the fundamental frequency.', 410, 665, {
-        'font-size': 18, 'text-anchor': 'middle',
-      });
     },
   },
   {
@@ -501,19 +506,19 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['3c685067aa0d4183c9daa43d662382ef87efc702.png'],
     output: 'helmholtz-octave-naming-example.svg',
-    alt: 'Eight notes labelled in Helmholtz notation: g¹, f², f³, b, f, d¹, A, and BB, with a change from treble to bass clef.',
-    width: 980,
-    height: 270,
+    alt: 'Notes in treble and bass clef labelled with Helmholtz octave names: g′, f″, f‴, b, f, d′, A, and BB.',
+    width: 710,
+    height: 178,
     render({ VF, context, overlay }) {
-      const groups = [
-        { x: 35, clef: 'treble', pitches: ['g/4', 'f/5', 'f/6', 'b/3'], labels: ['g¹', 'f²', 'f³', 'b'] },
-        { x: 495, clef: 'bass', pitches: ['f/3', 'd/4', 'a/2', 'b/1'], labels: ['f', 'd¹', 'A', 'BB'] },
-      ];
-      groups.forEach(({ x, clef, pitches, labels }) => {
-        const result = drawStave(VF, context, { x, y: 55, width: 450, clef, notes: pitches.map((key) => ({ key, duration: 'w' })), formatWidth: 320 });
-        result.notes.forEach((writtenNote, index) => overlay.text(labels[index], writtenNote.getAbsoluteX(), 235, {
-          'font-size': 22, 'text-anchor': 'middle',
-        }));
+      const treble = drawMeasures(VF, context, { x: 0, y: 19, widths: [124, 76, 73, 79], time: 'C', endBar: 'single', measures: [melody('g4:w'), melody('f5:w'), melody('f6:w'), melody('b3:w')] });
+      const bass = drawMeasures(VF, context, { x: 352, y: 19, widths: [79, 78, 76, 89], clef: 'bass', endBar: 'end', measures: [melody('f3:w'), melody('d4:w'), melody('a2:w'), melody('b1:w')] });
+      const labels = [['g', 'i'], ['f', 'ii'], ['f', 'iii'], ['b', ''], ['f', ''], ['d', 'i'], ['A', ''], ['BB', '']];
+      [...treble, ...bass].forEach(({ notes }, index) => {
+        const [letter, mark] = labels[index];
+        const x = noteX(notes[0]);
+        const serif = { 'font-family': 'Georgia, "Times New Roman", serif', 'font-weight': '700', fill: '#222' };
+        overlay.text(letter, x, 161, { ...serif, 'font-size': 16, 'text-anchor': mark ? 'end' : 'middle' });
+        if (mark) overlay.text(mark, x + 3, 152, { ...serif, 'font-size': 12 });
       });
     },
   },

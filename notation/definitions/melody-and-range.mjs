@@ -1,22 +1,21 @@
+import { drawMeasures, melody, noteX } from '../figure-helpers.mjs';
+
 export const definitions = [
   {
     id: 'melodic-contour',
     sources: ['c32e677198a253273e91fa742ab010574fb28de7.png'],
     output: 'melodic-contour.svg',
-    alt: 'A melody that rises and then falls, with a red curve tracing its contour.',
-    width: 820,
-    height: 240,
+    alt: 'A melody that rises from C to a high C and then falls to A, with a red curve tracing its contour.',
+    width: 320,
+    height: 88,
     render({ VF, context, overlay }) {
-      const stave = new VF.Stave(45, 65, 730).addClef('treble');
-      stave.setContext(context).draw();
-      const keys = ['c/4', 'e/4', 'g/4', 'b/4', 'd/5', 'c/5', 'a/4'];
-      const notes = keys.map((key) => new VF.StaveNote({ keys: [key], duration: 'q' }));
-      const voice = new VF.Voice({ num_beats: 7, beat_value: 4 }).setStrict(false).addTickables(notes);
-      new VF.Formatter().joinVoices([voice]).format([voice], 590);
-      voice.setStave(stave).draw(context, stave);
-      overlay.path('M 130 180 C 280 165 390 90 500 92 C 600 94 650 135 700 170', { fill: 'none', stroke: '#d32f2f', 'stroke-width': 4, 'stroke-linecap': 'round' });
-      overlay.text('ascending', 270, 220, { fill: '#b3261e', 'text-anchor': 'middle' });
-      overlay.text('descending', 600, 220, { fill: '#b3261e', 'text-anchor': 'middle' });
+      const measures = drawMeasures(VF, context, {
+        x: 0, y: -28, widths: [75, 102, 66, 75], spread: 0.8,
+        measures: [melody('c4'), melody('c4 e4 g4'), melody('c5:h.'), melody('a4:h.')],
+      });
+      // The contour rises from below the second C to the high C and falls towards the final A.
+      const [start, peak, end] = [noteX(measures[1].notes[0]) - 22, noteX(measures[2].notes[0]), noteX(measures[3].notes[0]) - 10];
+      overlay.path(`M ${start} 64 Q ${peak - 25} -12 ${end} 42`, { fill: 'none', stroke: '#e5251b', 'stroke-width': 2.6 });
     },
   },
   {

@@ -57,7 +57,7 @@ To find the rest of the notes in a major key, start at the tonic and go up follo
 >
 > These major scales all follow the same pattern of whole steps and half steps. They have different sets of notes because the pattern starts on different notes.
 >
-> ![C major, D major, and E flat major scales illustrating the whole-whole-half-whole-whole-whole-half pattern.](../images/notation/major-scale-step-pattern-examples.svg)
+> ![C major, D major, and B flat major scales illustrating the whole-whole-half-whole-whole-whole-half pattern.](../images/notation/major-scale-step-pattern-examples.svg)
 >
 > All major scales have the same pattern of half steps and whole steps, beginning on the note that names the scale - the tonic.
 >

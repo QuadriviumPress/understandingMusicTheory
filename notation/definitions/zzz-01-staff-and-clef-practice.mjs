@@ -1,6 +1,80 @@
-import { drawStave, labelUnder } from '../figure-helpers.mjs';
+import { drawStave, labelUnder, noteX, placeNotes } from '../figure-helpers.mjs';
 
-const exercisePitches = ['b/3', 'd/4', 'e/4', 'a/4', 'g/4', 'e/4', 'f/4', 'c/4', 'b/3', 'a/3', 'f/5', 'd/4'];
+// The same staff positions are read in each clef (steps above the bottom line).
+const exerciseSteps = [0, 4, 5, 9, 7, 3, 6, -1, -3, 12, 2];
+const clefBottomLine = { treble: ['e', 4], bass: ['g', 2], alto: ['f', 3] };
+const letters = ['c', 'd', 'e', 'f', 'g', 'a', 'b'];
+
+function exerciseKeys(clef) {
+  const [letter, octave] = clefBottomLine[clef];
+  return exerciseSteps.map((step) => {
+    const index = letters.indexOf(letter) + step;
+    return `${letters[((index % 7) + 7) % 7]}/${octave + Math.floor(index / 7)}`;
+  });
+}
+
+// Ledger-line exercise: fourteen quarter notes at fixed staff positions,
+// named differently in treble and bass clef.
+const ledgerXs = [78, 133, 200, 258, 325, 383, 440, 518, 583, 645, 718, 778, 845, 905].map((x) => x / 1.45);
+const ledgerPitches = {
+  treble: ['b3', 'f3', 'g3', 'd3', 'a3', 'c4', 'e3', 'c6', 'e6', 'b5', 'f6', 'd6', 'g6', 'a5'],
+  bass: ['d2', 'a1', 'b1', 'f1', 'c2', 'e2', 'g1', 'e4', 'g4', 'd4', 'a4', 'f4', 'b4', 'c4'],
+};
+
+function drawLedgerRow(VF, context, overlay, { y, clef, showClef = true, letters }) {
+  placeNotes(VF, context, {
+    x: 0, y, width: 655, clef: showClef ? clef : null, noteClef: clef, beginBar: 'none',
+    items: ledgerPitches[clef].map((pitch, index) => ({ x: ledgerXs[index], music: `${pitch}:q`, extra: { stemDirection: index < 7 ? 1 : -1 } })),
+  });
+  if (!letters) return;
+  ledgerPitches[clef].forEach((pitch, index) => overlay.text(pitch[0].toUpperCase(), ledgerXs[index], index < 7 ? y + letters[1] : y + letters[0], {
+    'font-size': 15, 'text-anchor': 'middle', fill: '#e5251b',
+  }));
+}
+
+function drawClefNameRows(VF, context, overlay, showAnswers) {
+  [['treble', 0], ['bass', 155], ['alto', 310]].forEach(([clef, y]) => {
+    const keys = exerciseKeys(clef);
+    const { notes } = drawStave(VF, context, {
+      x: 0, y, width: 900, clef, formatWidth: 760, notes: keys.map((key) => ({ key, duration: 'q' })),
+    });
+    if (showAnswers) notes.forEach((item, index) => overlay.text(keys[index][0].toUpperCase(), noteX(item), y + 142, {
+      'font-size': 19, 'font-weight': '700', 'text-anchor': 'middle',
+    }));
+  });
+}
+
+const mnemonicBlue = '#1e5aa8';
+const clefGlyphs = { treble: '\uE050', bass: '\uE062' };
+
+// Large hand-drawn staff for the mnemonic figures: words sit on (and break)
+// the lines, or sit in the spaces. The clef is the Bravura glyph scaled so one
+// em spans four staff spaces, anchored on its reference line (G or F).
+function drawMnemonicStaff(overlay, { top, spacing = 34, width = 800, clef, lineWords = [], spaceWords = [] }) {
+  const size = 21;
+  const wordWidth = (word) => word.length * size * 0.62;
+  for (let line = 0; line < 5; line += 1) {
+    const y = top + line * spacing;
+    const word = lineWords[4 - line];
+    if (word) {
+      const [text, x] = word;
+      overlay.line(line === 0 ? 10 : 0, y, x - 12, y, { stroke: '#111', 'stroke-width': 3 });
+      if (line > 0) overlay.line(x + wordWidth(text) + 10, y, width - 5, y, { stroke: '#111', 'stroke-width': 3 });
+    } else overlay.line(0, y, width, y, { stroke: '#111', 'stroke-width': 3 });
+  }
+  const anchor = clef === 'bass' ? top + spacing : top + spacing * 3;
+  overlay.text(clefGlyphs[clef], 4, anchor, { 'font-family': 'Bravura', 'font-size': spacing * 3.5, fill: '#16302b' });
+  lineWords.forEach(([text, x], index) => {
+    const y = top + (4 - index) * spacing + 7;
+    overlay.text(text[0], x, y, { 'font-size': size, 'font-weight': '700', fill: '#111' });
+    overlay.text(text.slice(1), x + size * 0.72 + (text.length > 1 && text.length < 3 ? 4 : 0), y, { 'font-size': size, 'font-weight': '700', fill: mnemonicBlue });
+  });
+  spaceWords.forEach(([text, x], index) => {
+    const y = top + (4 - index) * spacing - spacing / 2 + 7;
+    overlay.text(text[0], x, y, { 'font-size': size, 'font-weight': '700', fill: '#111' });
+    overlay.text(text.slice(1), x + size * 0.72, y, { 'font-size': size, 'font-weight': '700', fill: mnemonicBlue });
+  });
+}
 
 export const definitions = [
   {
@@ -54,16 +128,19 @@ export const definitions = [
     sources: ['d0df5580a52bd5ff1c22982ff89e7ce408a5750a.png'],
     output: 'bass-clef-mnemonics.svg',
     alt: 'Bass-clef line names G B D F A and space names A C E G with common mnemonic phrases.',
-    width: 820,
-    height: 440,
-    render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 55, y: 50, width: 700, clef: 'bass' });
-      [['G', 190, 154], ['B', 295, 134], ['D', 400, 114], ['F', 505, 94], ['A', 610, 74]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
-      overlay.text('Bass-clef lines: “Good Boys Do Fine Always”', 410, 200, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
-      overlay.text('or “Good Boys Deserve Fudge Always”', 410, 228, { fill: '#1769aa', 'font-size': 17, 'text-anchor': 'middle' });
-      drawStave(VF, context, { x: 55, y: 270, width: 700, clef: 'bass' });
-      [['A', 235, 364], ['C', 350, 344], ['E', 465, 324], ['G', 580, 304]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
-      overlay.text('Bass-clef spaces: “All Cows Eat Grass”', 410, 425, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
+    width: 800,
+    height: 670,
+    render({ overlay }) {
+      drawMnemonicStaff(overlay, {
+        top: 78, clef: 'bass',
+        lineWords: [['Good', 238], ['Boys', 352], ['Do', 466], ['Fine', 570], ['Always', 680]],
+      });
+      overlay.text('Bass clef lines:\n"Good Boys Do Fine Always"\nor\n"Good Boys Deserve Fudge Always"', 270, 280, { fill: mnemonicBlue, 'font-size': 21, 'data-line-height': 29 });
+      drawMnemonicStaff(overlay, {
+        top: 432, clef: 'bass',
+        spaceWords: [['All', 140], ['Cows', 276], ['Eat', 432], ['Grass', 573]],
+      });
+      overlay.text('Bass clef spaces:\n"All Cows Eat Grass"', 238, 628, { fill: mnemonicBlue, 'font-size': 21, 'data-line-height': 29 });
     },
   },
   {
@@ -116,61 +193,41 @@ export const definitions = [
     id: 'clef-note-name-practice',
     sources: ['17e780a24ae09def5583b27898930f3dd936bfa3.png'],
     output: 'clef-note-name-practice.svg',
-    alt: 'Treble, bass, and alto staves containing notes to identify by letter name.',
-    width: 980,
-    height: 500,
-    render({ VF, context, overlay }) {
-      [['treble', 35], ['bass', 185], ['alto', 335]].forEach(([clef, y]) => {
-        drawStave(VF, context, { x: 40, y, width: 900, clef, notes: exercisePitches.map((key) => ({ key, duration: 'w' })), formatWidth: 740 });
-      });
-      overlay.text('Write the letter name of each note.', 490, 25, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' });
-    },
+    alt: 'Treble, bass, and alto staves with the same eleven note positions, for naming each note in each clef.',
+    width: 900,
+    height: 450,
+    render({ VF, context, overlay }) { drawClefNameRows(VF, context, overlay, false); },
   },
   {
     id: 'clef-note-name-answers',
     sources: ['3087ad9e3af32de3f3c0f6278eca1ce3558cff12.png'],
     output: 'clef-note-name-answers.svg',
-    alt: 'Treble, bass, and alto note-identification exercises with letter-name answers.',
-    width: 980,
-    height: 560,
-    render({ VF, context, overlay }) {
-      const answers = {
-        treble: ['B', 'D', 'E', 'A', 'G', 'E', 'F', 'C', 'B', 'A', 'F', 'D'],
-        bass: ['D', 'F', 'G', 'C', 'B', 'G', 'A', 'E', 'D', 'C', 'A', 'F'],
-        alto: ['F', 'A', 'B', 'F', 'E', 'B', 'C', 'G', 'F', 'E', 'C', 'A'],
-      };
-      [['treble', 35], ['bass', 205], ['alto', 375]].forEach(([clef, y]) => {
-        drawStave(VF, context, { x: 40, y, width: 900, clef, notes: exercisePitches.map((key) => ({ key, duration: 'w' })), formatWidth: 740 });
-        labelUnder(overlay, answers[clef], 190, 61, y + 145, { fill: '#c62828', 'font-weight': '700' });
-      });
-    },
+    alt: 'Treble, bass, and alto staves with the same eleven note positions, each note labelled with its letter name in that clef.',
+    width: 900,
+    height: 470,
+    render({ VF, context, overlay }) { drawClefNameRows(VF, context, overlay, true); },
   },
   {
     id: 'ledger-note-practice',
     sources: ['9c39c637224c0bba225d33a4a11dfd0c9c0583bb.png'],
     output: 'ledger-note-practice.svg',
-    alt: 'A clef-selection exercise with notes on ledger lines above and below a blank staff.',
-    width: 980,
-    height: 300,
+    alt: 'A staff with no clef and notes on ledger lines below and above it, to be named once a clef is chosen.',
+    width: 655,
+    height: 150,
     render({ VF, context, overlay }) {
-      const pitches = ['b/3', 'g/3', 'a/3', 'f/3', 'c/4', 'd/4', 'g/3', 'c/6', 'e/6', 'b/5', 'f/6', 'd/6', 'g/6', 'a/5'];
-      drawStave(VF, context, { x: 40, y: 85, width: 900, clef: null, notes: pitches.map((key) => ({ key, duration: 'w' })), formatWidth: 800 });
-      overlay.text('Choose a clef, then name each ledger-line note.', 490, 40, { 'font-size': 19, 'font-weight': '700', 'text-anchor': 'middle' });
+      drawLedgerRow(VF, context, overlay, { y: 20, clef: 'treble', showClef: false });
     },
   },
   {
     id: 'ledger-note-practice-answers',
     sources: ['25011ac162a03037c0aaa44f2843334c4564072e.png'],
     output: 'ledger-note-practice-answers.svg',
-    alt: 'Ledger-line note exercise answered in treble and bass clefs.',
-    width: 980,
-    height: 500,
+    alt: 'Ledger-line notes below and above the staff named in treble clef (B F G D A C E, then C E B F D G A) and in bass clef (D A B F C E G, then E G D A F B C).',
+    width: 655,
+    height: 375,
     render({ VF, context, overlay }) {
-      const pitches = ['b/3', 'g/3', 'a/3', 'f/3', 'c/4', 'd/4', 'g/3', 'c/6', 'e/6', 'b/5', 'f/6', 'd/6', 'g/6', 'a/5'];
-      [['treble', 55, ['B', 'G', 'A', 'F', 'C', 'D', 'G', 'C', 'E', 'B', 'F', 'D', 'G', 'A']], ['bass', 270, ['D', 'A', 'B', 'F', 'C', 'E', 'G', 'E', 'G', 'D', 'A', 'F', 'B', 'C']]].forEach(([clef, y, labels]) => {
-        drawStave(VF, context, { x: 40, y, width: 900, clef, notes: pitches.map((key) => ({ key, duration: 'w' })), formatWidth: 750 });
-        labelUnder(overlay, labels, 170, 55, y + 160, { fill: '#c62828', 'font-weight': '700' });
-      });
+      drawLedgerRow(VF, context, overlay, { y: 27, clef: 'treble', letters: [111, 151] });
+      drawLedgerRow(VF, context, overlay, { y: 199, clef: 'bass', letters: [113, 160] });
     },
   },
 ];

@@ -1,4 +1,4 @@
-import { drawStave, note } from '../figure-helpers.mjs';
+import { arrowLine, drawIntervalRows, drawMeasures, drawStave, melody, note, noteX, placeNotes } from '../figure-helpers.mjs';
 
 const ink = '#111';
 const blue = '#1769aa';
@@ -78,6 +78,35 @@ function drawHarmonicSeries(VF, context, overlay, options = {}) {
   if (numbers) keys.forEach((_, index) => overlay.text(String(index + 1), x + 105 + index * ((width - 155) / 15), y + 135, { 'font-size': 12, 'text-anchor': 'middle' }));
 }
 
+const classifyIntervalExercise = [
+  { measures: [['a/4', 'b/4'], ['c/5', 'a/4'], ['a/4', 'e/5'], ['f/4', 'c/4']], labels: ['Major Second', 'Minor Third', 'Perfect Fifth', 'Perfect Fourth'] },
+  { measures: [['d/4', 'd/5'], ['d/5', ['f/4', '#']], ['e/5', 'e/5'], [['g/4', 'b'], 'f/5']], labels: ['Perfect Octave', 'Minor Sixth', 'Unison\n(Perfect prime)', 'Major Seventh'] },
+  { clef: 'bass', measures: [[['a/2', 'b'], 'f/3'], ['e/3', ['f/2', '#']], ['c/3', 'e/3'], ['b/3', 'c/4']], labels: ['Major Sixth', 'Minor Seventh', 'Major Third', 'Minor Second'] },
+];
+
+const completeIntervalExercise = [
+  { measures: [[['a/4', 'b'], ['e/5', 'b']], [['f/5', '#'], ['c/5', '#']], ['d/5', ['c/5', '#']], ['g/4', 'g/4']], labels: ['P5 higher', 'P4 lower', 'm2 lower', 'Pprime'] },
+  { measures: [['d/5', ['f/5', '#']], ['a/5', 'b/4'], [['b/3', 'b'], ['b/4', 'b']], ['e/4', ['c/5', '#']]], labels: ['M3 higher', 'm7 lower', 'P 8ve higher', 'M6 higher'] },
+  { clef: 'bass', measures: [['e/3', ['g/2', '#']], [['f/3', '#'], ['g/3', '#']], ['f/3', ['b/2', 'b']], [['e/3', 'b'], ['g/3', 'b']]], labels: ['m6 lower', 'M2 higher', 'P5 lower', 'm3 higher'] },
+];
+
+const augmentedDiminishedExercise = [
+  {
+    measures: [['d/4', ['d/5', '#']], [['d/5', 'b'], ['f/4', '#']], ['c/5', ['f/5', '#']], [['a/4', 'b'], ['g/4', '#']]],
+    labels: ['Augmented Octave\nHigher', 'Diminished Sixth\nLower', 'Augmented Fourth\nHigher', 'Diminished Second\nLower'],
+  },
+  {
+    clef: 'bass',
+    measures: [[['a/2', 'b'], ['a/2', 'n']], ['g/3', ['a/2', '#']], ['c/3', ['e/3', '#']], ['c/4', ['f/3', '#']]],
+    labels: ['Augmented Prime\nHigher', 'Diminished Seventh\nLower', 'Augmented Third\nHigher', 'Diminished Fifth\nLower'],
+  },
+];
+
+const intervalNumberExercise = {
+  measures: [['f/4', 'a/4'], ['d/5', 'g/4'], ['d/4', 'd/5'], ['b/4', 'c/5'], ['g/5', 'a/4'], ['b/4', 'e/5']],
+  labels: ['Third', 'Fifth', 'Octave', 'Second', 'Seventh', 'Fourth'],
+};
+
 export const definitions = [
   {
     id: 'counting-written-intervals',
@@ -85,15 +114,24 @@ export const definitions = [
     sources: ['8ecdfe8f4dbf66d814697cc5b8817d42ed89f3c5.png'],
     output: 'counting-written-intervals.svg',
     alt: 'Treble-clef B to D is counted across three staff positions; bass-clef A to F is counted across six.',
-    width: 760,
-    height: 360,
+    width: 373,
+    height: 265,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 70, y: 25, width: 620, notes: [intervalChord(VF, 'b/4', 'd/5')], formatWidth: 210 });
-      ['1', '2', '3'].forEach((n, i) => overlay.text(n, 300 + i * 38, 175, { 'font-size': 15, 'text-anchor': 'middle' }));
-      overlay.text('Count:', 245, 175, { 'font-size': 15 });
-      drawStave(VF, context, { x: 70, y: 185, width: 620, clef: 'bass', notes: [intervalChord(VF, 'a/2', 'f/3')], formatWidth: 210 });
-      ['1', '2', '3', '4', '5', '6'].forEach((n, i) => overlay.text(n, 292 + i * 34, 335, { 'font-size': 15, 'text-anchor': 'middle' }));
-      overlay.text('Count:', 230, 335, { 'font-size': 15 });
+      // Each arrow points at one staff position between the two notes; steps count from the bottom line.
+      const example = ({ y, clef, low, high, steps }) => {
+        const stave = new VF.Stave(0, y, 370).addClef(clef).setEndBarType(VF.BarlineType.NONE).setBegBarType(VF.BarlineType.NONE);
+        stave.setContext(context).draw();
+        const bottom = stave.getYForLine(4);
+        const yOf = (step) => bottom - step * 5;
+        [low, high].forEach(([x, step]) => overlay.text('', x, yOf(step), { 'font-family': 'Bravura', 'font-size': 40, 'text-anchor': 'middle', fill: '#111' }));
+        steps.forEach(([x, step], index) => {
+          arrowLine(overlay, x, yOf(step) + 48, x, yOf(step) + 3, { head: 9, 'stroke-width': 1.3 });
+          overlay.text(String(index + 1), x, bottom + 58, { 'font-size': 13, 'text-anchor': 'middle' });
+        });
+        overlay.text('Count:', steps[0][0] - (steps.length > 3 ? 12 : 42), bottom + 58, { 'font-size': 13, 'text-anchor': 'end' });
+      };
+      example({ y: -13, clef: 'treble', low: [127, 4], high: [200, 6], steps: [[140, 4], [167, 5], [193, 6]] });
+      example({ y: 123, clef: 'bass', low: [93, -1], high: [260, 4], steps: [[107, -1], [139, 0], [167, 1], [195, 2], [223, 3], [252, 4]] });
     },
   },
   {
@@ -115,11 +153,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['0bf05d9e775798258180a99a2ffd159ebd3e4e85.png'],
     output: 'compound-intervals-ninth-and-beyond.svg',
-    alt: 'Compound intervals above C labelled ninth, tenth, eleventh, and twelfth, continuing beyond the octave.',
-    width: 850,
-    height: 230,
+    alt: 'Compound intervals above E: a ninth, tenth, eleventh, and twelfth.',
+    width: 640,
+    height: 140,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'd/5'], ['c/4', 'e/5'], ['c/4', 'f/5'], ['c/4', 'g/5']], { width: 850, labels: ['Ninth', 'Tenth', 'Eleventh', 'Twelfth, and so on…'], labelY: 192 });
+      drawIntervalRows(VF, context, overlay, [{
+        measures: [['e/4', 'f/5'], ['e/4', 'g/5'], ['e/4', 'a/5'], ['e/4', 'b/5']],
+        labels: ['Ninth', 'Tenth', 'Eleventh', 'Twelfth, and so on...'],
+      }], { widths: [185, 130, 130, 135], endBar: 'single', labelOffset: 118, y: 0 });
     },
   },
   {
@@ -127,11 +168,11 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['9111533eb14a4014b873e66548bccebb32e35bc3.png'],
     output: 'interval-number-practice.svg',
-    alt: 'Six unlabelled written intervals on a treble staff for interval-number practice.',
-    width: 960,
-    height: 190,
+    alt: 'Six intervals in treble clef for naming by number',
+    width: 662,
+    height: 95,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'd/4'], ['c/4', 'c/5'], ['c/4', 'g/4'], ['e/4', 'g/4'], ['c/4', 'a/4'], ['d/4', 'g/4']], { width: 960 });
+      drawIntervalRows(VF, context, overlay, [{ measures: intervalNumberExercise.measures }], { y: -2, widths: [160, 95, 100, 108, 100, 99], labelOffset: 104, labelSize: 15 });
     },
   },
   {
@@ -139,13 +180,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['76aa06be5447ea944743e35c9d5967c60607a74a.png'],
     output: 'interval-size-by-half-steps.svg',
-    alt: 'Four thirds and fifths demonstrate that intervals with the same staff distance can contain different numbers of half steps.',
-    width: 920,
-    height: 300,
+    alt: 'Six given notes with instructions to write a second lower, octave lower, fifth higher, third higher, sixth higher, and fourth lower.',
+    width: 655,
+    height: 150,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [
-        ['a/4', 'c/5'], ['a/4', 'c#/5', [null, '#']], ['a/4', 'e/5'], ['a/4', 'eb/5', [null, 'b']],
-      ], { width: 920, labels: ['Three half steps = a third', 'Four half steps = a different third', 'Seven half steps = a fifth', 'Six half steps = a different fifth'], labelY: 208 });
+      drawIntervalRows(VF, context, overlay, [{
+        measures: ['b/4', 'f/5', 'a/4', 'd/5', 'c/4', 'a/5'].map((key) => [key, { ghost: true }]),
+        labels: ['Second\nLower', 'Octave\nLower', 'Fifth\nHigher', 'Third\nHigher', 'Sixth\nHigher', 'Fourth\nLower'],
+      }], { y: -6, widths: [150, 96, 104, 110, 98, 97], labelOffset: 111, labelSize: 15 });
     },
   },
   {
@@ -177,12 +219,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['8efa51e8939876415c455e3c0b390e66fa04da32.png'],
     output: 'major-and-minor-interval-examples.svg',
-    alt: 'Minor and major seconds, thirds, sixths, and sevenths compared above C.',
-    width: 1060,
-    height: 365,
+    alt: 'Minor and major seconds, thirds, sixths, and sevenths above C.',
+    width: 970,
+    height: 330,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'db/4', [null, 'b']], ['c/4', 'd/4'], ['c/4', 'eb/4', [null, 'b']], ['c/4', 'e/4']], { width: 1060, labels: ['Minor Second', 'Major Second', 'Minor Third', 'Major Third'], labelY: 180 });
-      pairRow(VF, context, overlay, [['c/4', 'ab/4', [null, 'b']], ['c/4', 'a/4'], ['c/4', 'bb/4', [null, 'b']], ['c/4', 'b/4']], { width: 1060, y: 190, labels: ['Minor Sixth', 'Major Sixth', 'Minor Seventh', 'Major Seventh'], labelY: 350 });
+      drawIntervalRows(VF, context, overlay, [
+        { measures: [['c/4', ['d/4', 'b']], ['c/4', 'd/4'], ['c/4', ['e/4', 'b']], ['c/4', 'e/4']], labels: ['Minor Second', 'Major Second', 'Minor Third', 'Major Third'] },
+        { measures: [['c/4', ['a/4', 'b']], ['c/4', 'a/4'], ['c/4', ['b/4', 'b']], ['c/4', 'b/4']], labels: ['Minor Sixth', 'Major Sixth', 'Minor Seventh', 'Major Seventh'] },
+      ], { rowHeight: 165, labelOffset: 122, widths: [268, 212, 238, 232] });
     },
   },
   {
@@ -190,12 +234,11 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['353ee2d79e1b6c84699e438f7286e307474a23e6.png'],
     output: 'classify-major-minor-intervals-practice.svg',
-    alt: 'Eight unlabelled treble- and bass-clef intervals for complete interval-name practice.',
-    width: 1060,
-    height: 330,
+    alt: 'Twelve unlabelled intervals in two treble staves and one bass staff, for naming each interval.',
+    width: 970,
+    height: 560,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'd/4'], ['c/4', 'eb/4', [null, 'b']], ['d/4', 'a/4'], ['e/4', 'c/5']], { width: 1060 });
-      pairRow(VF, context, overlay, [['c/3', 'a/3'], ['d/3', 'c/4'], ['e/3', 'g/3'], ['f/3', 'eb/4', [null, 'b']]], { width: 1060, y: 175, clef: 'bass' });
+      drawIntervalRows(VF, context, overlay, classifyIntervalExercise.map(({ labels, ...row }) => row), { rowHeight: 185 });
     },
   },
   {
@@ -203,12 +246,11 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['2a98cbbce6f7ff1fa2cfe1808a9be2b7997d16df.png'],
     output: 'classify-major-minor-intervals-solutions.svg',
-    alt: 'Eight interval examples labelled major second, minor third, perfect fifth, perfect fourth, perfect octave, minor sixth, perfect unison, and major seventh.',
-    width: 1060,
-    height: 390,
+    alt: 'Twelve intervals labelled: major second, minor third, perfect fifth, perfect fourth, perfect octave, minor sixth, unison, major seventh, major sixth, minor seventh, major third, and minor second.',
+    width: 970,
+    height: 560,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'd/4'], ['c/4', 'eb/4', [null, 'b']], ['d/4', 'a/4'], ['e/4', 'a/4']], { width: 1060, labels: ['Major Second', 'Minor Third', 'Perfect Fifth', 'Perfect Fourth'], labelY: 180 });
-      pairRow(VF, context, overlay, [['c/3', 'c/4'], ['c/3', 'ab/3', [null, 'b']], ['g/3', 'g/3'], ['c/3', 'b/3']], { width: 1060, y: 205, clef: 'bass', labels: ['Perfect Octave', 'Minor Sixth', 'Unison\n(Perfect prime)', 'Major Seventh'], labelY: 365 });
+      drawIntervalRows(VF, context, overlay, classifyIntervalExercise, { rowHeight: 185 });
     },
   },
   {
@@ -216,18 +258,11 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['ce803b3272dee1a6280f68545024860164005f22.png'],
     output: 'complete-intervals-practice.svg',
-    alt: 'Twelve given notes with named upward or downward intervals and blanks for writing the second note.',
-    width: 1080,
-    height: 545,
+    alt: 'Twelve given notes with interval names such as P5 higher, for writing the second note.',
+    width: 970,
+    height: 510,
     render({ VF, context, overlay }) {
-      const rows = [
-        [{ low: 'c/4', high: 'g/4', label: 'P5 higher' }, { low: 'g/4', high: 'c/4', label: 'P4 lower' }, { low: 'e/4', high: 'd#/4', label: 'm2 lower' }, { low: 'c/4', high: 'c/4', label: 'Prime' }],
-        [{ low: 'c/4', high: 'e/4', label: 'M3 higher' }, { low: 'a/4', high: 'b/3', label: 'm7 lower' }, { low: 'c/4', high: 'c/5', label: 'P8 higher' }, { low: 'c/4', high: 'ab/4', label: 'm6 higher' }],
-        [{ low: 'c/3', high: 'eb/2', label: 'm6 lower' }, { low: 'c/3', high: 'd/3', label: 'M2 higher' }, { low: 'c/3', high: 'f/2', label: 'P5 lower' }, { low: 'c/3', high: 'eb/3', label: 'm3 higher' }],
-      ];
-      promptRow(VF, context, overlay, rows[0], { width: 1080, y: 20 });
-      promptRow(VF, context, overlay, rows[1], { width: 1080, y: 190 });
-      promptRow(VF, context, overlay, rows[2], { width: 1080, y: 360, clef: 'bass' });
+      drawIntervalRows(VF, context, overlay, completeIntervalExercise.map((row) => ({ ...row, measures: row.measures.map(([first]) => [first, { ghost: true }]) })), { rowHeight: 165, labelOffset: 122 });
     },
   },
   {
@@ -235,18 +270,11 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['9812d93de8f0b4b7ae1aea556a84993acf3c1aa5.png'],
     output: 'complete-intervals-solutions.svg',
-    alt: 'Completed answers for twelve named upward and downward intervals in treble and bass clefs.',
-    width: 1080,
-    height: 545,
+    alt: 'Answers: each given note paired with the note forming the named interval.',
+    width: 970,
+    height: 510,
     render({ VF, context, overlay }) {
-      const rows = [
-        [{ low: 'c/4', high: 'g/4', label: 'P5 higher' }, { low: 'g/4', high: 'c/4', label: 'P4 lower' }, { low: 'e/4', high: 'd#/4', label: 'm2 lower', accidentals: [null, '#'] }, { low: 'c/4', high: 'c/4', label: 'Prime' }],
-        [{ low: 'c/4', high: 'e/4', label: 'M3 higher' }, { low: 'a/4', high: 'b/3', label: 'm7 lower' }, { low: 'c/4', high: 'c/5', label: 'P8 higher' }, { low: 'c/4', high: 'ab/4', label: 'm6 higher', accidentals: [null, 'b'] }],
-        [{ low: 'c/3', high: 'eb/2', label: 'm6 lower', accidentals: [null, 'b'] }, { low: 'c/3', high: 'd/3', label: 'M2 higher' }, { low: 'c/3', high: 'f/2', label: 'P5 lower' }, { low: 'c/3', high: 'eb/3', label: 'm3 higher', accidentals: [null, 'b'] }],
-      ];
-      promptRow(VF, context, overlay, rows[0], { width: 1080, y: 20, solution: true });
-      promptRow(VF, context, overlay, rows[1], { width: 1080, y: 190, solution: true });
-      promptRow(VF, context, overlay, rows[2], { width: 1080, y: 360, clef: 'bass', solution: true });
+      drawIntervalRows(VF, context, overlay, completeIntervalExercise, { rowHeight: 165, labelOffset: 122 });
     },
   },
   {
@@ -255,15 +283,12 @@ export const definitions = [
     sources: ['fb26939cb57d2a82f63dd722d29db73845b9e3ad.png'],
     output: 'augmented-diminished-interval-practice.svg',
     alt: 'Eight given notes with named augmented or diminished intervals and blanks for writing the second note.',
-    width: 1080,
-    height: 385,
+    width: 970,
+    height: 390,
     render({ VF, context, overlay }) {
-      promptRow(VF, context, overlay, [
-        { low: 'c/4', high: 'c#/5', label: 'Augmented Octave\nHigher' }, { low: 'a/4', high: 'c#/4', label: 'Diminished Sixth\nLower' }, { low: 'c/4', high: 'f#/4', label: 'Augmented Fourth\nHigher' }, { low: 'e/4', high: 'd#/4', label: 'Diminished Second\nLower' },
-      ], { width: 1080, y: 20 });
-      promptRow(VF, context, overlay, [
-        { low: 'c/3', high: 'c#/4', label: 'Augmented Prime\nHigher' }, { low: 'b/3', high: 'd/3', label: 'Diminished Seventh\nLower' }, { low: 'c/3', high: 'e#/3', label: 'Augmented Third\nHigher' }, { low: 'a/3', high: 'db/3', label: 'Diminished Fifth\nLower' },
-      ], { width: 1080, y: 205, clef: 'bass' });
+      drawIntervalRows(VF, context, overlay, augmentedDiminishedExercise.map((row) => ({
+        ...row, measures: row.measures.map(([first]) => [first, { ghost: true }]),
+      })));
     },
   },
   {
@@ -272,15 +297,10 @@ export const definitions = [
     sources: ['563ec9e172273ad08e28a9f222aec657339cbf73.png'],
     output: 'augmented-diminished-interval-solutions.svg',
     alt: 'Completed answers for eight named augmented and diminished intervals in treble and bass clefs.',
-    width: 1080,
-    height: 385,
+    width: 970,
+    height: 390,
     render({ VF, context, overlay }) {
-      promptRow(VF, context, overlay, [
-        { low: 'c/4', high: 'c#/5', label: 'Augmented Octave\nHigher', accidentals: [null, '#'] }, { low: 'a/4', high: 'c#/4', label: 'Diminished Sixth\nLower', accidentals: [null, '#'] }, { low: 'c/4', high: 'f#/4', label: 'Augmented Fourth\nHigher', accidentals: [null, '#'] }, { low: 'e/4', high: 'd#/4', label: 'Diminished Second\nLower', accidentals: [null, '#'] },
-      ], { width: 1080, y: 20, solution: true });
-      promptRow(VF, context, overlay, [
-        { low: 'c/3', high: 'c#/3', label: 'Augmented Prime\nHigher', accidentals: [null, '#'] }, { low: 'b/3', high: 'd/3', label: 'Diminished Seventh\nLower' }, { low: 'c/3', high: 'e#/3', label: 'Augmented Third\nHigher', accidentals: [null, '#'] }, { low: 'a/3', high: 'db/3', label: 'Diminished Fifth\nLower', accidentals: [null, 'b'] },
-      ], { width: 1080, y: 205, clef: 'bass', solution: true });
+      drawIntervalRows(VF, context, overlay, augmentedDiminishedExercise);
     },
   },
   {
@@ -288,19 +308,27 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['57c3afee0d3d8890000a64ea020ceeb925b9cb44.png'],
     output: 'interval-inversion-motion.svg',
-    alt: 'Arrows show a C–F perfect fourth inverted to a perfect fifth and a B–D minor third inverted to a major sixth.',
-    width: 960,
-    height: 260,
+    alt: 'From F, down to C is a perfect fourth and up to C is a perfect fifth; from B, down to D is a major sixth and up to D is a minor third.',
+    width: 682,
+    height: 140,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['c/4', 'f/4'], ['c/4', 'f/4'], ['b/3', 'd/4'], ['b/3', 'd/4']], { width: 960 });
-      overlay.path('M 115 125 Q 175 65 235 105', { fill: 'none', stroke: blue, 'stroke-width': 3, 'marker-end': 'none' });
-      overlay.path('M 350 105 Q 410 65 470 125', { fill: 'none', stroke: red, 'stroke-width': 3 });
-      overlay.path('M 590 125 Q 650 65 710 105', { fill: 'none', stroke: blue, 'stroke-width': 3 });
-      overlay.path('M 825 105 Q 870 65 925 125', { fill: 'none', stroke: red, 'stroke-width': 3 });
-      title(overlay, 'Down to C:\nPerfect Fourth', 165, 205, { fill: blue, 'font-size': 14, 'data-line-height': 18 });
-      title(overlay, 'Up to C:\nPerfect Fifth', 395, 205, { fill: red, 'font-size': 14, 'data-line-height': 18 });
-      title(overlay, 'Down to D:\nMajor Sixth', 635, 205, { fill: blue, 'font-size': 14, 'data-line-height': 18 });
-      title(overlay, 'Up to D:\nMinor Third', 865, 205, { fill: red, 'font-size': 14, 'data-line-height': 18 });
+      drawMeasures(VF, context, { x: 0, y: -13, widths: [343, 336], endBar: 'end', measures: [[], []] });
+      placeNotes(VF, context, {
+        x: 0, y: -13, width: 682, clef: null, beginBar: 'none',
+        items: [
+          { x: 86, music: 'c4:w', extra: { color: blue } }, { x: 174, music: 'f4:w' }, { x: 257, music: 'c5:w', extra: { color: red } },
+          { x: 413, music: 'd4:w', extra: { color: blue } }, { x: 498, music: 'b4:w' }, { x: 571, music: 'd5:w', extra: { color: red } },
+        ],
+      });
+      arrowLine(overlay, 155, 62, 122, 74, { stroke: blue, 'stroke-width': 1.5 });
+      arrowLine(overlay, 196, 59, 236, 47, { stroke: red, 'stroke-width': 1.5 });
+      arrowLine(overlay, 478, 55, 444, 70, { stroke: blue, 'stroke-width': 1.5 });
+      arrowLine(overlay, 516, 50, 557, 39, { stroke: red, 'stroke-width': 1.5 });
+      const text = (value, x, y, fill = '#333') => overlay.text(value, x, y, { 'font-size': 15, fill, 'data-line-height': 20 });
+      overlay.text('From F', 181, 12, { 'font-size': 15, 'text-anchor': 'middle', fill: '#333' });
+      overlay.text('From B', 490, 12, { 'font-size': 15, 'text-anchor': 'middle', fill: '#333' });
+      text('Down to C :\nPerfect Fourth', 44, 111, blue); text('Up to C :\nPerfect Fifth', 225, 111, red);
+      text('Down to D :\nMajor Sixth', 379, 111, blue); text('Up to D :\nMinor Third', 554, 113, red);
     },
   },
   {
@@ -308,15 +336,15 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['d04e2c7f45f72dbbf040f2b7409342189f0ee877.png'],
     output: 'interval-inversion-examples.svg',
-    alt: 'A minor seventh inverts to a major second, and a minor third inverts to a major sixth; interval numbers sum to nine.',
-    width: 940,
-    height: 245,
+    alt: 'A minor seventh, D up to C, inverts to a major second, C up to D: 9 minus 7 equals 2, and minor inverts to major.',
+    width: 580,
+    height: 110,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 35, y: 35, width: 310, notes: [intervalChord(VF, 'c/4', 'bb/4', [null, 'b'])], formatWidth: 120 });
-      title(overlay, 'Minor Seventh', 185, 190, { 'font-size': 15, 'font-weight': '400' });
-      overlay.text('9 − 7 = 2\nMinor inverts to major', 470, 105, { 'font-size': 16, 'text-anchor': 'middle', 'data-line-height': 24 });
-      drawStave(VF, context, { x: 595, y: 35, width: 310, notes: [intervalChord(VF, 'bb/3', 'c/4', ['b', null])], formatWidth: 120 });
-      title(overlay, 'Inversion is a Major Second', 750, 190, { 'font-size': 15, 'font-weight': '400' });
+      const text = (value, x, y) => overlay.text(value, x, y, { 'font-size': 14, 'text-anchor': 'middle', fill: '#333' });
+      placeNotes(VF, context, { x: 0, y: -1, width: 173, beginBar: 'none', items: [{ x: 63, music: 'c5:w' }, { x: 116, music: 'd4:w' }] });
+      placeNotes(VF, context, { x: 360, y: -1, width: 218, beginBar: 'none', items: [{ x: 445, music: 'c4:w' }, { x: 498, music: 'd4:w' }] });
+      text('Minor Seventh', 91, 13); text('Inversion is a Major Second', 479, 13);
+      text('9 - 7 = 2', 264, 54); text('Minor inverts to major', 264, 75);
     },
   },
   {
@@ -324,26 +352,42 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['d7d88dada170cabb40a5168da677a7d94fdcb92d.png'],
     output: 'harmonic-series-one-through-sixteen.svg',
-    alt: 'The first sixteen harmonics ascend from low C through closely spaced upper partials, numbered one through sixteen.',
-    width: 1120,
-    height: 230,
-    render({ VF, context, overlay }) { drawHarmonicSeries(VF, context, overlay, { width: 1050, numbers: true }); },
+    alt: 'The first sixteen harmonics of a series on C, numbered 1 through 16: C, C, G, C, E, G, B flat, C, D, E, F sharp, G, A, B flat, B, C.',
+    width: 760,
+    height: 190,
+    render({ VF, context, overlay }) {
+      const number = (value, x, y) => overlay.text(String(value), x, y, { 'font-size': 16, 'text-anchor': 'middle' });
+      placeNotes(VF, context, {
+        x: 0, y: 72, width: 188, clef: 'bass', beginBar: 'none',
+        items: [['c2', 52], ['c3', 83], ['g3', 121], ['c4', 171]].map(([pitch, x]) => ({ x, music: `${pitch}:w` })),
+      });
+      [52, 83, 121, 171].forEach((x, index) => number(index + 1, x - 12, 72));
+      const upper = ['e4', 'g4', 'bb4', 'c5', 'd5', 'e5', 'f#5', 'g5', 'a5', 'bb5', 'bn5', 'c6'];
+      const xs = [200, 277, 321, 367, 412, 461, 515, 558, 598, 643, 697, 744];
+      placeNotes(VF, context, { x: 183, y: -7, width: 577, beginBar: 'none', items: upper.map((pitch, index) => ({ x: xs[index], music: `${pitch}:w` })) });
+      [233, 277, 319, 364, 412, 460, 514, 560, 600, 646, 696, 744].forEach((x, index) => number(index + 5, x, 113));
+    },
   },
   {
     id: 'bugle-calls-from-harmonic-series',
     status: 'vexflow-overlay',
     sources: ['b486203049c855e0c049ef8dbd7b63b77c827f07.png'],
     output: 'bugle-calls-from-harmonic-series.svg',
-    alt: 'Short notated excerpts of the bugle calls Assembly and Taps, using only notes of one harmonic series.',
-    width: 1080,
-    height: 430,
+    alt: 'The bugle calls Assembly and Taps, written using only the pitches G, C, E, and G of the harmonic series.',
+    width: 910,
+    height: 545,
     render({ VF, context, overlay }) {
-      overlay.text('Assembly', 35, 28, { 'font-size': 17, 'font-weight': '700' });
-      drawStave(VF, context, { x: 35, y: 35, width: 1010, time: '2/4', notes: notesForKeys(['g/4', 'c/5', 'e/5', 'g/5', 'e/5', 'c/5', 'g/4', 'c/5', 'g/5', 'e/5', 'c/5', 'g/4'], '8'), formatWidth: 830, beams: true });
-      overlay.text('Taps', 35, 228, { 'font-size': 17, 'font-weight': '700' });
-      drawStave(VF, context, { x: 35, y: 235, width: 1010, time: '4/4', notes: [
-        { key: 'g/4', duration: 'q' }, note(VF, { key: 'c/5', duration: 'h', dots: 1 }), { key: 'g/4', duration: 'q' }, { key: 'c/5', duration: 'q' }, note(VF, { key: 'e/5', duration: 'h', dots: 1 }), { key: 'c/5', duration: 'q' }, { key: 'e/5', duration: 'q' }, { key: 'g/5', duration: 'h' },
-      ], formatWidth: 810 });
+      const lines = [
+        { y: 10, width: 820, time: 'C', music: 'g4:8. g4:16 | c5:8. g4:16 c5:8. e5:16 c5:q c5:8. c5:16 | e5:8. c5:16 e5:8. g5:16 e5:q c5:8. e5:16' },
+        { y: 125, width: 605, music: 'g5:q e5:8. c5:16 g4:q g4:8. g4:16 | c5:q c5:8. c5:16 c5:q', endBar: 'end' },
+        { y: 300, width: 905, time: 'C', music: 'g4:8. g4:16 | c5:h.@ g4:8. c5:16 | e5:h.@ g4:8 c5:8 | e5:q g4:8 c5:8 e5:q g4:8 c5:8 | e5:h.@ c5:8. e5:16' },
+        { y: 415, width: 655, music: 'g5:h e5:q c5:q | g4:h. g4:8. g4:16 | c5:h.@', endBar: 'end' },
+      ];
+      overlay.text('Assembly', 0, 26, { 'font-size': 19, 'font-weight': '700' });
+      overlay.text('Taps', 0, 312, { 'font-size': 19, 'font-weight': '700' });
+      lines.forEach(({ y, width, time, music, endBar }) => drawStave(VF, context, {
+        x: 0, y, width, time, endBar, formatWidth: width - (time ? 105 : 80), notes: melody(music), beams: true,
+      }));
     },
   },
   {
@@ -351,15 +395,21 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['72da008accbc59a9f87e758ae9df1cca1fec2cf4.png'],
     output: 'brass-valve-harmonic-series.svg',
-    alt: 'Four harmonic series compare no valves, second valve a half step lower, first valve a whole step lower, and their available middle-register notes.',
-    width: 1120,
-    height: 620,
+    alt: 'Four staves: the harmonic series on C with no valves, on B with the second valve (a half step lower), on B flat with the first valve (a whole step lower), and the middle-register notes these three series provide.',
+    width: 592,
+    height: 550,
     render({ VF, context, overlay }) {
-      drawHarmonicSeries(VF, context, overlay, { y: 35, width: 1040, heading: 'No valves' });
-      drawHarmonicSeries(VF, context, overlay, { y: 175, width: 1040, transpose: -1, heading: 'Second valve: harmonic series one half step lower' });
-      drawHarmonicSeries(VF, context, overlay, { y: 315, width: 1040, transpose: -2, heading: 'First valve: harmonic series one whole step lower' });
-      title(overlay, 'Middle-register notes available using no valve, second valve, or first valve alone', 560, 470, { 'font-size': 15 });
-      drawStave(VF, context, { x: 160, y: 475, width: 800, notes: notesForKeys(['g/4', 'ab/4', 'a/4', 'bb/4', 'b/4', 'c/5', 'c#/5', 'd/5', 'eb/5', 'e/5', 'f/5', 'f#/5', 'g/5'], 'q'), formatWidth: 650 });
+      const rows = [
+        ['No valves', 'c3:w c4:w g4:w c5:w e5:w g5:w bb5:w c6:w'],
+        ['2nd valve: Harmonic Series one half step lower', 'b2:w b3:w f#4:w b4:w d#5:w f#5:w a5:w b5:w'],
+        ['1st valve: Harmonic Series one whole step lower', 'bb2:w bb3:w f4:w bb4:w d5:w f5:w ab5:w bb5:w'],
+        ['Mid-range notes available using no valve, 2nd valve alone, or 1st valve alone', 'f4:w f#4:w g4:w bb4:w bn4:w c5:w d5:w d#5:w e5:w f5:w f#5:w g5:w'],
+      ];
+      rows.forEach(([heading, music], index) => {
+        const y = [10, 153, 287, 427][index];
+        overlay.text(heading, 6, y + 14, { 'font-size': 13 });
+        drawStave(VF, context, { x: 5, y: y + 10, width: index === 3 ? 587 : 530, formatWidth: index === 3 ? 480 : 440, notes: melody(music) });
+      });
     },
   },
   {
@@ -367,13 +417,16 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['74be71ab69d9e91436d322a2526bb0cfe55ddf04.png'],
     output: 'combined-valves-harmonic-series.svg',
-    alt: 'Opening the first and second valves produces a harmonic series one and a half steps lower and fills the remaining middle-register pitches.',
-    width: 1080,
-    height: 360,
+    alt: 'The harmonic series on A, produced with the first and second valves together, and the new midrange notes E, A, and C sharp it supplies; only G sharp is still missing.',
+    width: 450,
+    height: 340,
     render({ VF, context, overlay }) {
-      drawHarmonicSeries(VF, context, overlay, { y: 35, width: 1010, transpose: -3, heading: 'First and second valves: harmonic series one and a half steps lower' });
-      drawStave(VF, context, { x: 140, y: 195, width: 800, notes: notesForKeys(['g/4', 'ab/4', 'a/4', 'bb/4', 'b/4', 'c/5', 'c#/5', 'd/5', 'eb/5', 'e/5', 'f/5', 'f#/5', 'g/5'], 'q'), formatWidth: 650 });
-      overlay.text('The combined valve positions complete the chromatic notes in the middle register.', 540, 345, { 'font-size': 16, 'text-anchor': 'middle' });
+      overlay.text('A', 15, 22, { 'font-size': 15, 'font-weight': '700' });
+      overlay.text('Harmonic Series', 32, 22, { 'font-size': 15 });
+      drawStave(VF, context, { x: 0, y: 5, width: 450, formatWidth: 330, notes: melody('a2:w a3:w e4:w a4:w c#5:w e5:w g5:w a5:w') });
+      overlay.text('New midrange notes:', 5, 176, { 'font-size': 15 });
+      drawStave(VF, context, { x: 0, y: 160, width: 220, formatWidth: 110, notes: melody('e4:w a4:w c#5:w') });
+      overlay.text('The only midrange note still missing is the G♯,\nwhich can be played by adding a third valve, and\nholding down the second and third valves at the same time.', 10, 290, { 'font-size': 14, 'data-line-height': 21 });
     },
   },
   {

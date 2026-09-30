@@ -1,4 +1,4 @@
-import { drawStave, labelUnder, note } from '../figure-helpers.mjs';
+import { arrowLine, drawMeasures, drawRhythmEquation, drawStave, labelUnder, melody, note, noteX } from '../figure-helpers.mjs';
 
 function box(overlay, x, y, width = 150, height = 78) {
   overlay.path(`M ${x} ${y} H ${x + width} V ${y + height} H ${x} Z`, { fill: 'none', stroke: '#555', 'stroke-width': 1.5 });
@@ -145,20 +145,19 @@ export const definitions = [
     id: 'four-four-measure-equivalents',
     sources: ['1c02351a802600540e0111b6209222fb77641a53.png'],
     output: 'four-four-measure-equivalents.svg',
-    alt: 'A four-four staff showing four quarters, two halves, one whole, and two quarters plus four eighths as equal measures.',
-    width: 1050,
-    height: 290,
+    alt: 'Four-four measures filled by four quarters, two halves, one whole note, and two quarters with four eighths; the top number gives four beats per measure and the quarter note gets one beat.',
+    width: 790,
+    height: 228,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 60, width: 960, time: '4/4', notes: [
-        ...Array.from({ length: 4 }, () => ({ key: 'c/5', duration: 'q' })),
-        ...Array.from({ length: 2 }, () => ({ key: 'c/5', duration: 'h' })),
-        { key: 'c/5', duration: 'w' },
-        ...Array.from({ length: 2 }, () => ({ key: 'c/5', duration: 'q' })),
-        ...Array.from({ length: 4 }, () => ({ key: 'c/5', duration: '8' })),
-      ], formatWidth: 790, beams: true });
-      overlay.text('4 beats in a measure', 185, 35, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' });
-      overlay.text('4 quarters  =  2 halves  =  1 whole  =  2 quarters and 4 eighths', 560, 230, { 'font-size': 18, 'text-anchor': 'middle' });
-      overlay.text('A quarter note gets one beat', 185, 270, { 'font-size': 17, 'text-anchor': 'middle' });
+      drawMeasures(VF, context, {
+        x: 0, y: 41, widths: [257, 114, 72, 245], time: '4/4', spread: 0.8, beams: [[], [], [], [[1, 2], [4, 5]]],
+        measures: [melody('g4 g4 g4 g4'), melody('g4:h g4:h'), melody('g4:w'), melody('g4:q g4:8 g4:8 g4:q g4:8 g4:8')],
+      });
+      overlay.text('4 beats in a measure', 7, 23, { 'font-size': 16 });
+      arrowLine(overlay, 33, 33, 67, 69);
+      arrowLine(overlay, 46, 196, 68, 150);
+      overlay.text('A quarter note  gets one beat', 12, 219, { 'font-size': 16 });
+      overlay.text('4 quarters =  two halves   = one whole = 2 quarters and four eighths = and so on', 123, 176, { 'font-size': 16 });
     },
   },
   {

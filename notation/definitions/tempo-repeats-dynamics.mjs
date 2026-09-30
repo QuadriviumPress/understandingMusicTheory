@@ -1,3 +1,5 @@
+import { drawStave, drawMeasures, melody, noteX } from '../figure-helpers.mjs';
+
 function wholeNoteStave(VF, context, y) {
   const stave = new VF.Stave(55, y, 790).addClef('treble').addTimeSignature('C');
   stave.setContext(context).draw();
@@ -46,17 +48,30 @@ export const definitions = [
     id: 'dynamic-vocabulary',
     sources: ['f2b61cfd8801b8d1548d9d7df76190770472186e.png'],
     output: 'dynamic-vocabulary.svg',
-    alt: 'Common dynamic markings from fortississimo through pianississimo with their names and meanings.',
-    width: 900,
-    height: 500,
+    alt: 'Dynamic markings from mezzo forte to fortissississimo and from mezzo piano to pianissississimo, with their Italian names, meanings, and pronunciations.',
+    width: 985,
+    height: 690,
     render({ overlay }) {
-      const rows = [['fff', 'fortississimo', 'very, very loud'], ['ff', 'fortissimo', 'very loud'], ['f', 'forte', 'loud'], ['mf', 'mezzo forte', 'medium loud'], ['mp', 'mezzo piano', 'medium quiet'], ['p', 'piano', 'quiet'], ['pp', 'pianissimo', 'very quiet'], ['ppp', 'pianississimo', 'very, very quiet']];
-      rows.forEach(([mark, name, meaning], index) => {
-        const y = 48 + index * 55;
-        overlay.text(mark, 90, y, { 'font-size': 25, 'font-style': 'italic', 'font-weight': '700', 'text-anchor': 'middle' });
-        overlay.text(name, 205, y, { 'font-size': 18, 'font-weight': '700' });
-        overlay.text('=', 430, y, { 'font-size': 18 });
-        overlay.text(meaning, 480, y, { 'font-size': 18 });
+      const rows = [
+        ['', 30, 'mezzo forte', 'medium loud  (pronounced "MET-soh FOR-tay")'],
+        ['', 92, 'forte', 'loud ("FOR-tay")'],
+        ['', 153, 'fortissimo', 'very loud ("for-TISS-im-oh")'],
+        ['', 215, 'fortisissimo', 'very, very loud ("FOR-tiss-SISS-im-oh")'],
+        ['', 272, 'and so on...'],
+        ['', 400, 'mezzo piano', 'medium quiet ("MET-soh PYAN-oh")'],
+        ['', 460, 'piano', 'quiet ("PYAN-oh")'],
+        ['', 530, 'pianissimo', 'very quiet ("PEE-an-ISS-im-oh")', 522],
+        ['', 600, 'pianississimo', 'very, very quiet ("PEE-an-iss-ISS-im-oh")', 583],
+        ['', 670, 'and so on...', undefined, 645],
+      ];
+      const bold = { 'font-size': 22, 'font-weight': '700' };
+      rows.forEach(([glyph, y, term, meaning, textY = y]) => {
+        overlay.text(glyph, 4, y + 8, { 'font-family': 'Bravura', 'font-size': 58, fill: '#111' });
+        overlay.text(term, 178, textY, bold);
+        if (meaning) {
+          overlay.text('=', 356, textY, { ...bold, 'text-anchor': 'middle' });
+          overlay.text(meaning, 432, textY, bold);
+        }
       });
     },
   },
@@ -64,14 +79,25 @@ export const definitions = [
     id: 'gradual-dynamics',
     sources: ['0da96940e079272e14f867fb6afe50aab934db38.png'],
     output: 'gradual-dynamics.svg',
-    alt: 'Three equivalent ways to notate crescendo from piano to forte and diminuendo back to piano.',
-    width: 900,
-    height: 480,
+    alt: 'Three ways to write a gradual change from piano to forte and back: cresc. and decresc., cresc. and dim., and crescendo and decrescendo hairpins.',
+    width: 546,
+    height: 350,
     render({ VF, context, overlay }) {
-      [35, 175, 315].forEach((y) => wholeNoteStave(VF, context, y));
-      ['p     crescendo     f     decrescendo     p', 'p     cresc.     f     dim.     p', 'p                  f                  p'].forEach((text, index) => overlay.text(text, 450, 145 + index * 140, { 'font-size': 18, 'font-style': 'italic', 'text-anchor': 'middle' }));
-      overlay.path('M 230 423 L 430 397 L 430 449 Z', { fill: 'none', stroke: '#111', 'stroke-width': 2 });
-      overlay.path('M 470 397 L 670 423 L 470 449 Z', { fill: 'none', stroke: '#111', 'stroke-width': 2 });
+      const dynamic = (glyph, x, y) => overlay.text(glyph, x, y, { 'font-family': 'Bravura', 'font-size': 32, 'text-anchor': 'middle', fill: '#111' });
+      const word = (value, x, y) => overlay.text(value, x, y, { 'font-family': 'Georgia, serif', 'font-style': 'italic', 'font-weight': '700', 'font-size': 14, 'text-anchor': 'middle' });
+      const dash = (x, y) => overlay.line(x - 5, y - 5, x + 5, y - 5, { stroke: '#111', 'stroke-width': 1.5 });
+      [[-27, 'decresc.'], [93, 'dim.'], [218, null]].forEach(([y, fall]) => {
+        drawMeasures(VF, context, { x: 0, y, widths: [148, 94, 91, 109, 104], time: 'C', measures: Array.from({ length: 5 }, () => melody('a4:w')) });
+        const textY = y + 117;
+        dynamic('', 83, textY); dynamic('', 275, textY); dynamic('', 488, textY);
+        if (fall) {
+          word('cresc.', 156, textY); dash(204, textY); dash(242, textY);
+          word(fall, fall === 'dim.' ? 361 : 373, textY); dash(425, textY); dash(458, textY);
+        } else {
+          overlay.path(`M 246 ${textY - 12} L 98 ${textY - 7} L 246 ${textY - 2}`, { fill: 'none', stroke: '#111', 'stroke-width': 1.6 });
+          overlay.path(`M 321 ${textY - 12} L 467 ${textY - 7} L 321 ${textY - 2}`, { fill: 'none', stroke: '#111', 'stroke-width': 1.6 });
+        }
+      });
     },
   },
   {
@@ -96,21 +122,19 @@ export const definitions = [
     id: 'articulation-sampler',
     sources: ['7c179b36f452ae1939fc4bfc193fb62e59a75154.png'],
     output: 'articulation-sampler.svg',
-    alt: 'A phrase demonstrating staccato, tenuto, accents, slurs, and marcato articulation marks.',
-    width: 920,
-    height: 280,
+    alt: 'A three-four passage of D quarter notes marked with staccato and tenuto (portato), slurred staccato, accents combined with staccato and tenuto, and marcato.',
+    width: 660,
+    height: 170,
     render({ VF, context, overlay }) {
-      const stave = new VF.Stave(45, 75, 830).addClef('treble').addTimeSignature('3/4');
-      stave.setContext(context).draw();
-      const codes = ['a.', 'a.', 'a-', 'a-', 'a>', 'a>', 'a^', 'a^'];
-      const notes = codes.map((code, index) => new VF.StaveNote({ keys: [index < 4 ? 'b/4' : 'd/5'], duration: 'q' }).addModifier(new VF.Articulation(code).setPosition(VF.Modifier.Position.ABOVE), 0));
-      const voice = new VF.Voice({ num_beats: 8, beat_value: 4 }).setStrict(false).addTickables(notes);
-      new VF.Formatter().joinVoices([voice]).format([voice], 690);
-      voice.setStave(stave).draw(context, stave);
-      overlay.text('staccato', 180, 225, { 'text-anchor': 'middle' });
-      overlay.text('tenuto', 350, 225, { 'text-anchor': 'middle' });
-      overlay.text('accent', 535, 225, { 'text-anchor': 'middle' });
-      overlay.text('marcato', 720, 225, { 'text-anchor': 'middle' });
+      const marks = [['a.', 'a-'], ['a.', 'a-'], ['a.', 'a-'], ['a.'], ['a.'], ['a.'], ['a.', 'a>'], ['a-', 'a>'], []];
+      const quarters = marks.map((articulations) => ({ key: 'd/5', duration: 'q', articulations }));
+      const { notes } = drawStave(VF, context, {
+        x: 0, y: 30, width: 660, time: '3/4', formatWidth: 540,
+        notes: [...quarters.slice(0, 3), { bar: 'single' }, ...quarters.slice(3, 6), { bar: 'single' }, ...quarters.slice(6)],
+      });
+      const [x1, x2] = [noteX(notes[4]), noteX(notes[6])];
+      overlay.path(`M ${x1 - 6} 50 Q ${(x1 + x2) / 2} 26 ${x2 + 6} 50`, { fill: 'none', stroke: '#111', 'stroke-width': 2.2 });
+      overlay.text('marcato...', 578, 55, { 'font-size': 15, 'font-style': 'italic', 'font-weight': '700', 'font-family': 'Georgia, serif' });
     },
   },
 ];

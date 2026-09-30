@@ -1,4 +1,4 @@
-import { drawStave, note } from '../figure-helpers.mjs';
+import { arrowLine, drawIntervalRows, drawMeasures, drawRhythmEquation, drawStave, melody, note, noteX } from '../figure-helpers.mjs';
 
 const red = '#d32f2f';
 const blue = '#1565c0';
@@ -8,6 +8,11 @@ const pink = '#d81b60';
 function arrow(overlay, x, y1, y2, color = red) {
   overlay.line(x, y1, x, y2, { stroke: color, 'stroke-width': 2 });
   overlay.path(`M ${x - 7} ${y2 - 9} L ${x} ${y2} L ${x + 7} ${y2 - 9}`, { fill: 'none', stroke: color, 'stroke-width': 2 });
+}
+
+function redArrow(overlay, x, y1, y2) {
+  overlay.line(x, y1, x, y2, { stroke: red, 'stroke-width': 2 });
+  overlay.path(`M ${x - 10} ${y2 - 16} L ${x} ${y2} L ${x + 10} ${y2 - 16}`, { fill: 'none', stroke: red, 'stroke-width': 2 });
 }
 
 function bracket(overlay, x1, x2, y, label, color = '#111') {
@@ -36,17 +41,35 @@ function drawSegno(overlay, x, y, color = red) {
   overlay.circle(x + 18, y + 7, 2.8, { fill: color });
 }
 
-function dynamicsAccentNotes(VF) {
-  const marks = ['a>', 'a>', 'a^', 'a^', 'a^', null, null];
-  return marks.map((code, index) => {
-    const staveNote = note(VF, { key: index < 5 ? 'b/4' : 'd/4', duration: index < 5 ? '8' : 'h', dots: index >= 5 ? 1 : 0 });
-    if (code) staveNote.addModifier(new VF.Articulation(code).setPosition(VF.Modifier.Position.ABOVE), 0);
-    return staveNote;
-  });
+function dynamicsAccentNotes() {
+  const marks = [['a>'], [], [], ['a>'], [], [], ['a^'], [], ['a^'], [], ['a^'], []];
+  const eighths = marks.map((articulations) => ({ key: 'd/5', duration: '8', articulations, articulationColor: red }));
+  return [
+    ...eighths.slice(0, 6), { bar: 'single' }, ...eighths.slice(6), { bar: 'single' },
+    { key: 'g/4', duration: 'h', dots: 1 }, { bar: 'single' }, { key: 'g/4', duration: 'h', dots: 1 },
+  ];
 }
 
 function drawRoadmapStave(VF, context, x, y, notes, width = 520, time = '4/4') {
   return drawStave(VF, context, { x, y, width, time, notes, formatWidth: width - 150, beams: true });
+}
+
+// Dotted-duration worksheet: rows of [left items..., box, answer] in a 515 x 305 frame.
+const dottedRows = [
+  { headY: 54, items: [{ x: 11, music: 'f4:w' }, { x: 51, text: '=' }, { x: 97, music: 'f4:q' }, { box: [140, 212], top: 16, bottom: 70 }], answer: { x: 165, music: 'f4:h.' } },
+  { headY: 54, items: [{ x: 289, music: 'f4:w' }, { x: 329, text: '=' }, { x: 362, music: 'f4:q f4:q f4:8', spacing: 33 }, { box: [452, 515], top: 18, bottom: 72 }], answer: { x: 472, music: 'f4:q.' } },
+  { headY: 131, items: [{ x: 6, music: 'f4:w' }, { x: 41, music: 'f4:q f4:q', spacing: 31 }, { x: 102, text: '=' }, { box: [153, 215], top: 90, bottom: 144 }], answer: { x: 172, music: 'f4:w.' } },
+  { headY: 131, items: [{ x: 279, music: 'f4:8 f4:8', beam: true }, { x: 347, text: '=' }, { x: 381, music: 'f4:16' }, { box: [425, 515], top: 90, bottom: 144 }], answer: { x: 458, music: 'f4:8.' } },
+  { headY: 205, items: [{ x: 41, music: 'f4:q' }, { x: 83, text: '=' }, { box: [125, 188], top: 167, bottom: 221 }, { x: 205, music: 'f4:16' }], answer: { x: 145, music: 'f4:8.' } },
+  { headY: 205, items: [{ x: 309, music: 'r:q' }, { x: 344, music: 'r:8' }, { x: 377, text: '=' }, { box: [418, 515], top: 163, bottom: 218 }], answer: { x: 452, music: 'r:q.' } },
+  { headY: 278, items: [{ x: 14, music: 'f4:q' }, { x: 59, music: 'f4:h' }, { x: 103, text: '=' }, { box: [140, 215], top: 240, bottom: 294 }], answer: { x: 165, music: 'f4:h.' } },
+  { headY: 278, items: [{ x: 311, music: 'r:8' }, { x: 346, music: 'r:16' }, { x: 385, text: '=' }, { box: [424, 499], top: 236, bottom: 291 }], answer: { x: 452, music: 'r:8.' } },
+];
+
+function drawDottedWorksheet(VF, context, overlay, showAnswers) {
+  dottedRows.forEach(({ headY, items, answer }) => {
+    drawRhythmEquation(VF, context, overlay, showAnswers ? [...items, { ...answer, color: red }] : items, { headY });
+  });
 }
 
 export const definitions = [
@@ -57,19 +80,32 @@ export const definitions = [
     output: 'beat-grouping-by-time-signature.svg',
     alt: 'The same note values grouped in one-one, two-two, and four-four time, with red arrows marking one, two, or four beat beginnings per measure.',
     width: 900,
-    height: 500,
+    height: 580,
     render({ VF, context, overlay }) {
+      const rhythm = [melody('a4:w'), melody('a4:h a4:h'), melody('a4:q a4:q a4:q a4:q'), melody('a4:8 a4:8 a4:8 a4:8 a4:8 a4:8 a4:8 a4:8')];
       const rows = [
-        { y: 35, time: '1/1', notes: [{ key: 'b/4', duration: 'w' }, { key: 'b/4', duration: 'h' }, { key: 'b/4', duration: 'h' }, ...Array.from({ length: 4 }, () => ({ key: 'b/4', duration: 'q' })), ...Array.from({ length: 8 }, () => ({ key: 'b/4', duration: '8' }))], arrows: [165, 365, 555] },
-        { y: 175, time: '2/2', notes: [{ key: 'b/4', duration: 'w' }, { key: 'b/4', duration: 'h' }, { key: 'b/4', duration: 'h' }, ...Array.from({ length: 4 }, () => ({ key: 'b/4', duration: 'q' })), ...Array.from({ length: 8 }, () => ({ key: 'b/4', duration: '8' }))], arrows: [125, 220, 315, 410, 505, 600, 695] },
-        { y: 315, time: '4/4', notes: [{ key: 'b/4', duration: 'w' }, { key: 'b/4', duration: 'h' }, { key: 'b/4', duration: 'h' }, ...Array.from({ length: 4 }, () => ({ key: 'b/4', duration: 'q' })), ...Array.from({ length: 8 }, () => ({ key: 'b/4', duration: '8' }))], arrows: [105, 145, 185, 225, 295, 335, 375, 415, 500, 545, 590, 635] },
+        { time: '1/1', beats: 1, beams: [[0, 7]] },
+        { time: '2/2', beats: 2, beams: [[0, 3], [4, 7]] },
+        { time: '4/4', beats: 4, beams: [[0, 1], [2, 3], [4, 5], [6, 7]] },
       ];
-      rows.forEach(({ y, time, notes, arrows }) => {
-        drawStave(VF, context, { x: 45, y, width: 810, time, notes, formatWidth: 670, beams: true });
-        arrows.forEach((x) => arrow(overlay, x, y - 5, y + 23));
+      rows.forEach(({ time, beats, beams }, rowIndex) => {
+        const y = 40 + rowIndex * 165;
+        const measures = drawMeasures(VF, context, {
+          x: 0, y, widths: [190, 130, 215, 365], time, measures: rhythm, beams: [[], [], [], beams], spread: 0.7, centre: false,
+        });
+        measures.forEach(({ stave, notes }) => {
+          // A beat that falls inside a long note is placed proportionally
+          // between that note and the next one (or the barline).
+          const xs = [...notes.map(noteX), stave.getX() + stave.getWidth() + 14];
+          for (let beat = 0; beat < beats; beat += 1) {
+            const position = beat * notes.length / beats;
+            const index = Math.floor(position);
+            redArrow(overlay, xs[index] + (position - index) * (xs[index + 1] - xs[index]), y - 38, y + 28);
+          }
+        });
       });
-      arrow(overlay, 60, 453, 478);
-      label(overlay, '= beginning of a beat', 85, 480, { fill: red, 'font-weight': '700' });
+      redArrow(overlay, 68, 522, 572);
+      label(overlay, '=   beginning of a beat', 96, 548, { fill: red, 'font-size': 21 });
     },
   },
   {
@@ -77,16 +113,18 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['e2f8f09813a0e0bff4ecb4cb571a114b3f6163b0.png'],
     output: 'equivalent-two-four-rhythms.svg',
-    alt: 'Two rhythmically equivalent melodies in two-four time: the upper at quarter note equals 116 and the lower in doubled note values at half note equals 116.',
-    width: 920,
-    height: 330,
+    alt: 'Two rhythmically equivalent melodies: the upper in two-four time at quarter note equals 116, the lower in two-two time with doubled note values at half note equals 116.',
+    width: 760,
+    height: 285,
     render({ VF, context, overlay }) {
-      const upper = [{ key: 'd/4', duration: 'q' }, { key: 'd/4', duration: '8' }, { key: 'g/4', duration: '16' }, { key: 'a/4', duration: '16' }, { key: 'a/4', duration: '8' }, { key: 'a/4', duration: 'q' }, { key: 'd/4', duration: '8' }, { key: 'a/4', duration: '16' }, { key: 'b/4', duration: '16' }, note(VF, { key: 'c/5', duration: 'q', dots: 1 }), { key: 'd/4', duration: '8' }, { key: 'd/4', duration: '8' }, { rest: true, duration: 'q' }];
-      const lower = [{ key: 'd/4', duration: 'h' }, { key: 'd/4', duration: 'q' }, { key: 'g/4', duration: '8' }, { key: 'a/4', duration: '8' }, { key: 'a/4', duration: 'q' }, { key: 'a/4', duration: 'h' }, { key: 'd/4', duration: 'q' }, { key: 'a/4', duration: '8' }, { key: 'b/4', duration: '8' }, note(VF, { key: 'c/5', duration: 'h', dots: 1 }), { key: 'd/4', duration: 'q' }, { key: 'd/4', duration: 'h' }, { rest: true, duration: 'h' }];
-      drawStave(VF, context, { x: 45, y: 45, width: 830, key: 'G', time: '2/4', notes: upper, formatWidth: 670, beams: true });
-      drawStave(VF, context, { x: 45, y: 195, width: 830, key: 'G', time: '2/2', notes: lower, formatWidth: 670, beams: true });
-      label(overlay, 'Quarter note = 116', 60, 35, { 'font-weight': '700' });
-      label(overlay, 'Half note = 116', 60, 185, { 'font-weight': '700' });
+      const tempo = (glyph, y) => {
+        overlay.text(glyph, 12, y, { 'font-family': 'Bravura', 'font-size': 30, fill: '#111' });
+        label(overlay, '= 116', 26, y, { 'font-size': 15 });
+      };
+      tempo('', 26);
+      drawStave(VF, context, { x: 0, y: 18, width: 760, key: 'G', time: '2/4', formatWidth: 610, beams: true, notes: melody('d4:8 | d4:8. g4:16 g4:8 g4:8 | g4:q f4:8 g4:8 | a4:8. d4:16 d4:8 d4:8 | d4:q r:q') });
+      tempo('', 166);
+      drawStave(VF, context, { x: 0, y: 154, width: 760, key: 'G', time: '2/2', formatWidth: 610, notes: melody('d4:q | d4:q. g4:8 g4:q g4:q | g4:h f4:q g4:q | a4:q. d4:8 d4:q d4:q | d4:h r:h') });
     },
   },
   {
@@ -94,14 +132,18 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['540d38c5d4317268ef6344e38f6f46e2e352e370.png'],
     output: 'compound-six-eight-beats.svg',
-    alt: 'A six-eight rhythm with arrows showing two dotted-quarter beats, each divided into three eighth-note pulses.',
-    width: 760,
-    height: 250,
+    alt: 'Six-eight measures with red arrows marking two dotted-quarter beats in each measure.',
+    width: 720,
+    height: 270,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 65, width: 670, time: '6/8', notes: [note(VF, { key: 'b/4', duration: 'q', dots: 1 }), { key: 'b/4', duration: '8' }, { key: 'b/4', duration: '8' }, { key: 'b/4', duration: 'q' }, note(VF, { key: 'b/4', duration: 'q', dots: 1 })], formatWidth: 520, beams: true });
-      [160, 245, 370, 500, 590].forEach((x) => arrow(overlay, x, 20, 55));
-      arrow(overlay, 75, 185, 215);
-      label(overlay, '= beginning of a beat', 105, 218, { fill: red, 'font-weight': '700' });
+      const { notes } = drawStave(VF, context, {
+        x: 0, y: 55, width: 720, time: '6/8', formatWidth: 560, notes: melody('g4:q. g4:q. | g4:8 g4:8 g4:8 g4:q g4:8 | g4:h.'), beamGroups: [[3, 5]],
+      });
+      [notes[0], notes[1], notes[3], notes[6]].forEach((item) => redArrow(overlay, noteX(item), 45, 100));
+      redArrow(overlay, noteX(notes[9]), 45, 100);
+      redArrow(overlay, noteX(notes[9]) + 60, 45, 100);
+      redArrow(overlay, 45, 208, 262);
+      label(overlay, '=   beginning of a beat', 80, 236, { fill: red, 'font-size': 19, 'font-weight': '700' });
     },
   },
   {
@@ -110,31 +152,31 @@ export const definitions = [
     sources: ['77f33d1d601bfa5087cad774ba9e409e87922dd4.png'],
     output: 'common-meter-counting-chart.svg',
     alt: 'Chart of simple and compound duple, triple, and quadruple meters with count syllables and example time signatures.',
-    width: 930,
-    height: 390,
+    width: 900,
+    height: 392,
     render({ overlay }) {
+      const serif = { 'font-family': 'Georgia, "Times New Roman", serif' };
+      const simple = [['1', 283], ['&', 340], ['2', 395], ['&', 453], ['3', 510], ['&', 565], ['4', 618], ['&', 667]];
+      const compound = [['1', 283], ['&', 320], ['a', 355], ['2', 395], ['&', 433], ['a', 470], ['3', 510], ['&', 547], ['a', 582], ['4', 618], ['&', 655], ['a', 690]];
       const rows = [
-        ['Duple simple', '1  &  2  &', '2/4'],
-        ['Triple simple', '1  &  2  &  3  &', '3/4'],
-        ['Quadruple simple', '1  &  2  &  3  &  4  &', '4/4'],
-        ['Duple compound', '1  &  a  2  &  a', '6/8'],
-        ['Triple compound', '1  &  a  2  &  a  3  &  a', '9/8'],
-        ['Quadruple compound', '1  &  a  2  &  a  3  &  a  4  &  a', '12/8'],
+        ['Duple Simple', simple.slice(0, 4), '2', '4'], ['Triple Simple', simple.slice(0, 6), '3', '4'], ['Quadruple Simple', simple, '4', '4'],
+        ['Duple Compound', compound.slice(0, 6), '6', '8'], ['Triple Compound', compound.slice(0, 9), '9', '8'], ['Quadruple Compound', compound, '12', '8'],
       ];
-      label(overlay, 'Meter', 45, 38, { 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Count', 350, 38, { 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Example time signature', 735, 38, { 'font-size': 20, 'font-weight': '700' });
-      rows.forEach(([meter, count, signature], index) => {
-        const y = 84 + index * 49;
-        overlay.line(35, y + 15, 890, y + 15, { stroke: '#ef6c5b', 'stroke-width': 1.5 });
-        label(overlay, meter, 45, y);
-        const syllables = count.split('  ');
-        syllables.forEach((syllable, syllableIndex) => {
-          const x = 360 + syllableIndex * 42;
-          overlay.path(`M ${x - 15} ${y - 25} H ${x + 15} V ${y + 12} H ${x - 15} Z`, { fill: syllable === '&' || syllable === 'a' ? '#ffeb3b' : '#43a047', stroke: 'none' });
-          label(overlay, syllable, x, y + 3, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' });
+      const bounds = [48, 100, 158, 218, 275, 330, 386];
+      label(overlay, 'Meter', 55, 22, { ...serif, 'font-size': 20, 'font-weight': '700' });
+      label(overlay, 'Count', 365, 22, { ...serif, 'font-size': 20, 'font-weight': '700' });
+      label(overlay, 'Example Time Signature', 615, 24, { ...serif, 'font-size': 20, 'font-weight': '700' });
+      rows.forEach(([meter, syllables, top, bottom], index) => {
+        const [y1, y2] = [bounds[index], bounds[index + 1]];
+        syllables.forEach(([syllable, x]) => {
+          const fill = /\d/.test(syllable) ? '#3d9a37' : syllable === 'a' ? '#f7f21e' : '#dbe81c';
+          overlay.path(`M ${x - 14} ${y1} H ${x + 14} V ${y2} H ${x - 14} Z`, { fill, stroke: 'none' });
+          label(overlay, syllable, x, y2 - 7, { ...serif, 'font-size': /\d/.test(syllable) ? 27 : 22, 'font-weight': '700', 'text-anchor': 'middle', fill: '#222' });
         });
-        label(overlay, signature, 810, y, { 'font-size': 19, 'text-anchor': 'middle' });
+        overlay.line(0, y2, 890, y2, { stroke: '#f0735f', 'stroke-width': 2 });
+        label(overlay, meter, 4, y2 - 6, { ...serif, 'font-size': 21 });
+        label(overlay, top, 770, y1 + 22, { ...serif, 'font-size': 22, 'text-anchor': 'middle' });
+        label(overlay, bottom, 770, y2 - 5, { ...serif, 'font-size': 22, 'text-anchor': 'middle' });
       });
     },
   },
@@ -174,21 +216,20 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['1064d35194f9c5ffefc3f50c0ca0e338f6426d44.png'],
     output: 'four-phrases-with-pickups.svg',
-    alt: 'Four labelled melodic phrases, each beginning with one or two red pickup notes before its downbeat.',
-    width: 920,
-    height: 360,
+    alt: 'A melody in four phrases in cut time; each phrase begins with pickup notes, shown in red, before the downbeat.',
+    width: 820,
+    height: 262,
     render({ VF, context, overlay }) {
-      const phrases = [
-        { x: 35, y: 55, title: 'Phrase 1', keys: ['b/4', 'c/5', 'b/4', 'a/4', 'g/4', 'e/4'], pickups: 2 },
-        { x: 475, y: 55, title: 'Phrase 2', keys: ['d/4', 'e/4', 'g/4', 'a/4', 'b/4'], pickups: 1 },
-        { x: 35, y: 220, title: 'Phrase 3', keys: ['d/5', 'c/5', 'b/4', 'a/4', 'g/4', 'e/4'], pickups: 2 },
-        { x: 475, y: 220, title: 'Phrase 4', keys: ['e/4', 'd/4', 'c/4', 'd/4', 'e/4', 'g/4'], pickups: 1 },
-      ];
-      phrases.forEach(({ x, y, title, keys, pickups }) => {
-        drawStave(VF, context, { x, y, width: 405, key: 'G', notes: keys.map((key, index) => ({ key, duration: index === keys.length - 1 ? 'h' : 'q' })), formatWidth: 300 });
-        label(overlay, title, x + 200, y - 12, { 'font-weight': '700', 'text-anchor': 'middle' });
-        for (let index = 0; index < pickups; index += 1) arrow(overlay, x + 95 + index * 40, y + 108, y + 83);
+      const colour = (notes, indices) => notes.map((item, index) => (indices.includes(index) ? { ...item, color: red } : item));
+      drawStave(VF, context, {
+        x: 0, y: -8, width: 795, key: 'D', time: 'C|', formatWidth: 650, beamGroups: [[0, 1], [15, 18]],
+        notes: colour(melody('f5:8 e5:8 | b4:q a4:q f4:q d4:q | e4:q d4:q a3:q. c4:8 | d4:q d4:q d4:8 e4:8 f4:8 g4:8'), [0, 1, 11]),
       });
+      drawStave(VF, context, {
+        x: 0, y: 131, width: 820, key: 'D', formatWidth: 700, endBar: 'none', beamGroups: [[2, 3], [18, 19]],
+        notes: colour(melody('a4:h f4:q f5:8 e5:8 | b4:q a4:q f4:q d4:q | e4:q d4:q a3:q. f4:8 | c4:q e4:q a3:q b3:8 c4:8 | d4:h'), [2, 3, 13]),
+      });
+      [['Phrase 1', 150, 15], ['Phrase 2', 531, 17], ['Phrase 3', 207, 157], ['Phrase 4', 582, 157]].forEach(([text, x, y]) => overlay.text(text, x, y, { 'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle' }));
     },
   },
   {
@@ -209,71 +250,61 @@ export const definitions = [
   },
   {
     id: 'dotted-duration-practice',
-    status: 'svg-overlay',
+    status: 'vexflow-overlay',
     sources: ['b38c68f9b7567902f35080c958b602133e1646f3.png'],
     output: 'dotted-duration-practice.svg',
-    alt: 'Practice equations asking for a dotted note or rest that equals the note values shown on the left.',
-    width: 820,
-    height: 480,
-    render({ overlay }) {
-      const prompts = ['whole = half +', 'whole = quarter + quarter + eighth +', 'whole + quarter + quarter =', 'quarter + eighth =', 'quarter = sixteenth +', 'quarter + half =', 'quarter + half =', 'eighth rest + eighth rest ='];
-      prompts.forEach((prompt, index) => {
-        const col = index % 2;
-        const row = Math.floor(index / 2);
-        const x = 35 + col * 405;
-        const y = 55 + row * 100;
-        label(overlay, prompt, x, y, { 'font-size': 18 });
-        overlay.path(`M ${x + 250} ${y - 35} H ${x + 360} V ${y + 35} H ${x + 250} Z`, { fill: 'white', stroke: '#555', 'stroke-width': 2 });
-      });
-    },
+    alt: 'Eight note and rest equations with a box for the single dotted value that completes each one',
+    width: 515,
+    height: 305,
+    render({ VF, context, overlay }) { drawDottedWorksheet(VF, context, overlay, false); },
   },
   {
     id: 'dotted-duration-practice-solutions',
-    status: 'svg-overlay',
+    status: 'vexflow-overlay',
     sources: ['aea8aa79be190e40bc0147148906d1647e4b1b83.png'],
     output: 'dotted-duration-practice-solutions.svg',
-    alt: 'Completed dotted-duration equations with dotted half, whole, quarter, eighth, and dotted rests shown in red.',
-    width: 820,
-    height: 480,
-    render({ overlay }) {
-      const rows = [
-        ['whole = half +', 'dotted half'], ['whole = quarter + quarter + eighth +', 'dotted quarter'],
-        ['whole + quarter + quarter =', 'dotted whole'], ['quarter + eighth =', 'dotted quarter'],
-        ['quarter = sixteenth +', 'dotted eighth'], ['quarter + half =', 'dotted half'],
-        ['quarter + half =', 'dotted half'], ['eighth rest + eighth rest =', 'dotted quarter rest'],
-      ];
-      rows.forEach(([prompt, answer], index) => {
-        const x = 35 + (index % 2) * 405;
-        const y = 55 + Math.floor(index / 2) * 100;
-        label(overlay, prompt, x, y, { 'font-size': 18 });
-        overlay.path(`M ${x + 250} ${y - 35} H ${x + 360} V ${y + 35} H ${x + 250} Z`, { fill: 'white', stroke: '#555', 'stroke-width': 2 });
-        label(overlay, answer, x + 305, y + 5, { fill: red, 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      });
-    },
+    alt: 'Eight note and rest equations with a box for the single dotted value that completes each one, answered in red: dotted half, dotted quarter, dotted whole, dotted eighth, dotted eighth, dotted quarter rest, dotted half, and dotted eighth rest',
+    width: 515,
+    height: 305,
+    render({ VF, context, overlay }) { drawDottedWorksheet(VF, context, overlay, true); },
   },
   {
     id: 'borrowed-division-examples',
     status: 'vexflow-overlay',
     sources: ['497bb9fdd651f112aced13e093e724b06bb8b7fb.png'],
     output: 'borrowed-division-examples.svg',
-    alt: 'Whole, half, and quarter notes divided into triplets, quintuplets, and septuplets, with brackets and division numbers.',
-    width: 720,
-    height: 500,
+    alt: 'A whole note equals a half-note triplet or a quarter-note quintuplet; a half note equals a quarter-note triplet or an eighth-note septuplet; a quarter note equals an eighth-note triplet, a quarter-and-eighth triplet, or an eighth, eighth rest, and eighth triplet.',
+    width: 560,
+    height: 400,
     render({ VF, context, overlay }) {
+      // Each group floats without a staff; widths follow the source layout.
+      const group = (x, y, width, music, tuplet, beamGroups) => drawStave(VF, context, {
+        x, y, width, clef: null, hideLines: true, padding: 0, formatWidth: width - 25,
+        notes: melody(music, { stemDirection: 1 }), beamGroups,
+        tuplets: tuplet ? [{ ratioed: false, ...tuplet }] : [],
+      });
+      const equals = (x, y) => overlay.text('=', x, y, { 'font-size': 30, 'text-anchor': 'middle' });
       const rows = [
-        { y: 55, left: 'whole note', count: 3, duration: 'h', number: '3' },
-        { y: 185, left: 'half note', count: 3, duration: 'q', number: '3' },
-        { y: 315, left: 'quarter note', count: 3, duration: '8', number: '3' },
+        { y: 5, lead: 'f4:w', parts: [
+          [112, 125, 'f4:h f4:h f4:h', { from: 0, to: 2, numNotes: 3, notesOccupied: 2 }],
+          [310, 250, 'f4:q f4:q f4:q f4:q f4:q', { from: 0, to: 4, numNotes: 5, notesOccupied: 4 }],
+        ] },
+        { y: 135, lead: 'f4:h', parts: [
+          [102, 125, 'f4:q f4:q f4:q', { from: 0, to: 2, numNotes: 3, notesOccupied: 2 }],
+          [285, 260, 'f4:8 f4:8 f4:8 f4:8 f4:8 f4:8 f4:8', { from: 0, to: 6, numNotes: 7, notesOccupied: 4, bracketed: false }, [[0, 6]]],
+        ] },
+        { y: 265, lead: 'f4:q', parts: [
+          [90, 105, 'f4:8 f4:8 f4:8', { from: 0, to: 2, numNotes: 3, notesOccupied: 2, bracketed: false }, [[0, 2]]],
+          [272, 105, 'f4:q f4:8', { from: 0, to: 1, numNotes: 3, notesOccupied: 2 }],
+          [430, 125, 'f4:8 r:8 f4:8', { from: 0, to: 2, numNotes: 3, notesOccupied: 2 }],
+        ] },
       ];
-      rows.forEach(({ y, left, count, duration, number }, row) => {
-        label(overlay, left, 45, y + 35, { 'font-weight': '700' });
-        label(overlay, '=', 180, y + 35, { 'font-size': 25 });
-        drawStave(VF, context, { x: 215, y, width: 210, clef: null, notes: Array.from({ length: count }, () => ({ key: 'b/4', duration })), formatWidth: 130, beams: true });
-        bracket(overlay, 255, 390, y + 5, number);
-        label(overlay, '=', 445, y + 35, { 'font-size': 25 });
-        const otherCount = row === 0 ? 5 : 7;
-        drawStave(VF, context, { x: 480, y, width: 205, clef: null, notes: Array.from({ length: otherCount }, () => ({ key: 'b/4', duration: '8' })), formatWidth: 130, beams: true });
-        bracket(overlay, 515, 655, y + 5, String(otherCount));
+      rows.forEach(({ y, lead, parts }) => {
+        group(-12, y, 60, lead);
+        parts.forEach(([x, width, music, tuplet, beams], index) => {
+          equals(x - (index ? 24 : 36), y + 88);
+          group(x, y, width, music, tuplet, beams);
+        });
       });
     },
   },
@@ -282,14 +313,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['4d2420cf5eede85bc5c3f12ef4287b370db94fbb.png'],
     output: 'compound-meter-duplet.svg',
-    alt: 'A six-eight measure contrasting a group of three eighth notes with a duplet group of two eighth notes.',
-    width: 700,
-    height: 210,
-    render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 65, width: 610, time: '6/8', notes: [{ key: 'b/4', duration: '8' }, { key: 'b/4', duration: '8' }, { key: 'b/4', duration: '8' }, { key: 'b/4', duration: 'q' }, { key: 'b/4', duration: '8' }, { key: 'b/4', duration: '8' }, { key: 'b/4', duration: '8' }], formatWidth: 450, beams: true });
-      bracket(overlay, 390, 495, 45, '2');
-      label(overlay, 'ordinary compound beat', 210, 185, { 'text-anchor': 'middle' });
-      label(overlay, 'borrowed duplet', 450, 185, { 'text-anchor': 'middle' });
+    alt: 'A six-eight passage in which the second measure begins with a duplet: two eighth notes filling the time of three.',
+    width: 420,
+    height: 130,
+    render({ VF, context }) {
+      drawStave(VF, context, {
+        x: 0, y: 5, width: 420, time: '6/8', formatWidth: 300, notes: melody('f4:8 f4:8 f4:8 f4:q f4:8 | f4:8 f4:8 f4:8 f4:8 f4:8'),
+        beamGroups: [[0, 2], [6, 7], [8, 10]], tuplets: [{ from: 6, to: 7, numNotes: 2, notesOccupied: 3, bracketed: false, ratioed: false }],
+      });
     },
   },
   {
@@ -392,22 +423,36 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['6a71fe8ef244b0a4385573aff0451eaadabb8201.png'],
     output: 'first-second-and-third-endings.svg',
-    alt: 'A repeated passage with first-and-second and third ending brackets, annotated to show which ending is played on each pass.',
-    width: 940,
-    height: 390,
+    alt: 'A passage with a repeated section whose first-and-second ending (closed bracket) is played the first two times and whose third ending (open bracket) is played the third time.',
+    width: 820,
+    height: 360,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 135, width: 850, time: 'C', notes: Array.from({ length: 7 }, (_, index) => ({ key: index % 2 ? 'd/5' : 'b/4', duration: 'w' })), formatWidth: 680 });
-      bracket(overlay, 390, 625, 105, '1., 2.', red);
-      bracket(overlay, 625, 850, 105, '3.', blue);
-      label(overlay, 'Numbers identify the ending to take', 360, 42, { fill: red, 'font-weight': '700', 'text-anchor': 'middle' });
-      arrow(overlay, 465, 50, 95, red);
-      label(overlay, 'A closed bracket means leave after the ending', 710, 42, { fill: blue, 'font-weight': '700', 'text-anchor': 'middle' });
-      label(overlay, 'play every time', 225, 255, { 'text-anchor': 'middle' });
-      label(overlay, 'repeat on passes 1 and 2', 510, 255, { 'text-anchor': 'middle' });
-      label(overlay, 'continue after pass 3', 745, 255, { 'text-anchor': 'middle' });
-      curve(overlay, 120, 225, 330, 225, 10);
-      curve(overlay, 400, 225, 610, 225, 10);
-      curve(overlay, 650, 225, 850, 225, 10);
+      const text = (value, x, y, fill = '#222') => label(overlay, value, x, y, { 'font-size': 17, fill, 'data-line-height': 24 });
+      text('Closed bracket = go someplace else after ending', 418, 28, blue);
+      text('(repeat or D.S., for example)', 558, 53, blue);
+      text('Open bracket = go on', 635, 77, blue);
+      text('Numbers tell you\nwhich time(s) to take\nthis ending', 215, 78, red);
+      arrowLine(overlay, 504, 46, 615, 123, { stroke: blue, 'stroke-width': 1.5 });
+      arrowLine(overlay, 752, 89, 798, 123, { stroke: blue, 'stroke-width': 1.5 });
+      drawMeasures(VF, context, {
+        x: 0, y: 120, widths: [187, 142, 148, 144, 146, 53], key: 'F', time: 'C', endBars: [null, null, null, 'repeatEnd', null, 'none'],
+        measures: [melody('f4:w'), melody('a4:h c5:h'), melody('d5:w'), melody('c5:w'), melody('f5:w'), []],
+      });
+      const bracket = (x1, x2, number, closed) => {
+        overlay.path(`M ${x1} 146 V 127 H ${x2}${closed ? ' V 146' : ''}`, { fill: 'none', stroke: blue, 'stroke-width': 1.5 });
+        label(overlay, number, x1 + 4, 146, { fill: red, 'font-size': 16 });
+      };
+      bracket(329, 616, '1,2.', true);
+      bracket(623, 808, '3.', false);
+      const brace = (x1, x2) => {
+        const mid = (x1 + x2) / 2;
+        overlay.path(`M ${x1} 222 Q ${x1} 230 ${x1 + 12} 230 H ${mid - 12} Q ${mid} 230 ${mid} 238 Q ${mid} 230 ${mid + 12} 230 H ${x2 - 12} Q ${x2} 230 ${x2} 222`, { fill: 'none', stroke: '#111', 'stroke-width': 2.4 });
+      };
+      brace(83, 325); brace(350, 600); brace(631, 817);
+      text('Play these measures\nevery time.', 103, 267);
+      text('Play these measures\nand take the repeat\nthe first and second time.', 342, 265);
+      text('Skip them the third time.', 342, 338, red);
+      text('Play these measures\nthe third time\nand go on.', 642, 267);
     },
   },
   {
@@ -445,27 +490,33 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['6ff2ebbbc07037cf05e7f6a4621e7a5b1574b0cb.png'],
     output: 'da-capo-and-dal-segno-roadmaps.svg',
-    alt: 'Short score examples tracing da capo al fine and dal segno al coda routes with fine, segno, and coda markings.',
-    width: 940,
-    height: 700,
+    alt: 'Two road maps: a D.C. al fine example that returns to the beginning and stops at fine, and a D.S. al coda example that returns to the sign, jumps at the to-coda mark, and finishes with the coda.',
+    width: 625,
+    height: 515,
     render({ VF, context, overlay }) {
-      label(overlay, 'Example 1: D.C. al fine', 45, 35, { 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Play to D.C., return to the beginning, then stop at fine.', 45, 63);
-      drawRoadmapStave(VF, context, 55, 75, [{ key: 'd/4', duration: 'w' }, { key: 'd/4', duration: 'w' }, { key: 'e/4', duration: 'w' }, { key: 'e/4', duration: 'w' }], 820, '2/4');
-      label(overlay, 'fine', 475, 82, { 'font-style': 'italic', 'font-weight': '700' });
-      label(overlay, 'D.C. al fine', 760, 82, { 'font-style': 'italic', 'font-weight': '700' });
-      label(overlay, 'Example 2: D.S. al coda', 45, 235, { 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Return to the segno, then jump from “to coda” to the coda section.', 45, 263);
-      drawRoadmapStave(VF, context, 55, 275, [{ key: 'd/4', duration: 'w' }, { key: 'g/4', duration: 'w' }, { key: 'e/4', duration: 'w' }, { key: 'a/4', duration: 'w' }], 820, '2/4');
-      drawSegno(overlay, 810, 310, '#111');
-      label(overlay, '2nd time', 90, 445, { 'font-weight': '700' });
-      drawCoda(overlay, 190, 439, 10, '#111');
-      drawRoadmapStave(VF, context, 55, 455, [{ key: 'd/4', duration: 'w' }, { key: 'g/4', duration: 'w' }, { key: 'e/4', duration: 'w' }], 600, '2/4');
-      label(overlay, 'D.S. al coda', 525, 452, { 'font-style': 'italic', 'font-weight': '700' });
-      drawCoda(overlay, 68, 619, 12, '#111');
-      drawRoadmapStave(VF, context, 105, 600, [{ key: 'd/4', duration: 'w' }, { key: 'g/4', duration: 'w' }, { key: 'e/4', duration: 'w' }], 550, null);
-      overlay.path('M 800 360 C 790 460 685 520 110 610', { fill: 'none', stroke: red, 'stroke-width': 3 });
-      arrow(overlay, 110, 590, 615, red);
+      const italic = { 'font-family': 'Georgia, "Times New Roman", serif', 'font-style': 'italic', 'font-weight': '700', 'font-size': 14 };
+      const glyph = (code, x, y, size = 30) => overlay.text(code, x, y, { 'font-family': 'Bravura', 'font-size': size, 'text-anchor': 'middle', fill: '#111' });
+      const halves = (keys) => keys.map((key) => [{ key, duration: 'h' }]);
+      label(overlay, 'Example 1:\nPlay to the D.C., then go back to the beginning and play until you reach "fine", then stop.', 20, 17, { 'font-size': 13, 'data-line-height': 19 });
+      drawMeasures(VF, context, { x: 0, y: 35, widths: [151, 113, 109, 128], key: 'F', time: '2/4', measures: halves(['f/4', 'f/4', 'c/5', 'a/4']), endBars: [null, 'double', null, 'end'] });
+      label(overlay, 'fine', 270, 62, italic);
+      label(overlay, 'D.C.  al fine', 467, 63, italic);
+      label(overlay, 'Example 2: Play to the  D.S., then go back to the sign and play until you find\nthe "to coda".  Go directly to the coda and play to the end.', 22, 180, { 'font-size': 13, 'data-line-height': 19 });
+      drawMeasures(VF, context, { x: 0, y: 186, widths: [153, 110, 110, 124, 128], key: 'G', time: '2/4', measures: halves(['g/4', 'd/5', 'c/5', 'b/4', 'a/4']), endBars: [null, null, null, 'double', 'none'] });
+      glyph('\uE047', 499, 222);
+      drawMeasures(VF, context, { x: 0, y: 293, widths: [164, 121, 129], key: 'G', measures: halves(['c/5', 'b/4', 'a/4']), endBars: ['double', null, 'double'] });
+      label(overlay, '2nd time to', 74, 316, italic);
+      glyph('\uE048', 164, 316, 28);
+      label(overlay, 'D.S. al coda', 399, 322, italic);
+      glyph('\uE048', 34, 418, 28);
+      drawMeasures(VF, context, { x: 0, y: 409, widths: [153, 115, 143], key: 'G', measures: halves(['e/5', 'f/5', 'g/5']), endBar: 'end' });
+      const redCurve = (x1, y1, cx, cy, x2, y2) => {
+        overlay.path(`M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`, { fill: 'none', stroke: red, 'stroke-width': 2.2 });
+        const angle = Math.atan2(y2 - cy, x2 - cx);
+        [-0.5, 0.5].forEach((spread) => overlay.line(x2, y2, x2 - 12 * Math.cos(angle + spread), y2 - 12 * Math.sin(angle + spread), { stroke: red, 'stroke-width': 2.2 }));
+      };
+      redCurve(433, 310, 480, 280, 489, 226);
+      redCurve(149, 322, 150, 420, 64, 437);
     },
   },
   {
@@ -475,13 +526,17 @@ export const definitions = [
     output: 'accent-marking-types.svg',
     alt: 'A six-eight passage showing ordinary accents, caret accents, sforzando, and fortepiano markings.',
     width: 900,
-    height: 230,
+    height: 205,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 65, width: 810, time: '6/8', notes: dynamicsAccentNotes(VF), formatWidth: 650, beams: true });
-      label(overlay, 'sfz', 575, 185, { fill: red, 'font-style': 'italic', 'font-weight': '700', 'text-anchor': 'middle' });
-      label(overlay, '(sforzando)', 575, 210, { 'text-anchor': 'middle' });
-      label(overlay, 'fp', 740, 185, { fill: red, 'font-style': 'italic', 'font-weight': '700', 'text-anchor': 'middle' });
-      label(overlay, '(fortepiano)', 740, 210, { 'text-anchor': 'middle' });
+      const { notes } = drawStave(VF, context, {
+        x: 10, y: 25, width: 880, time: '6/8', notes: dynamicsAccentNotes(), formatWidth: 760, softmax: 40,
+        beamGroups: [[0, 2], [3, 5], [7, 9], [10, 12]],
+      });
+      [[notes[14], 'sfz', '(sforzando)'], [notes[16], 'fp', '(fortepiano)']].forEach(([item, mark, gloss]) => {
+        const x = noteX(item);
+        label(overlay, mark, x, 160, { fill: red, 'font-style': 'italic', 'font-weight': '700', 'text-anchor': 'middle' });
+        label(overlay, gloss, x, 188, { 'text-anchor': 'middle' });
+      });
     },
   },
   {
@@ -561,18 +616,19 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['6d2da02e6b304aa7421942d50f230b299f43e498.png'],
     output: 'conjunct-disjunct-and-mixed-motion.svg',
-    alt: 'Three labelled melodies illustrating conjunct stepwise motion, disjunct leaps, and a mixture of both types of melodic motion.',
-    width: 920,
-    height: 500,
+    alt: 'Three melodies: a conjunct melody moving mostly by step, a disjunct melody moving by leaps, and a melody mixing steps and leaps.',
+    width: 860,
+    height: 490,
     render({ VF, context, overlay }) {
       const rows = [
-        ['Conjunct', 40, null, ['b/4', 'a/4', 'b/4', 'c/5', 'd/5', 'c/5', 'b/4', 'a/4', 'b/4', 'a/4', 'g/4', 'f/4']],
-        ['Disjunct', 195, 'A', ['a/3', 'd/4', 'a/3', 'e/4', 'b/3', 'f/4', 'c/4', 'g/4']],
-        ['Mixed', 350, 'Eb', ['c/4', 'd/4', 'e/4', 'c/4', 'd/4', 'b/4', 'c/4', 'd/4', 'g/4', 'e/4']],
+        { title: 'Conjunct', key: 'F', time: '4/4', music: 'b4:q. a4:8 b4:q c5:q | d5:q c5:q b4:q a4:q | b4:q a4:q g4:q f4:q | a4:q. g4:8 f4:q e4:q' },
+        { title: 'Disjunct', key: 'D', time: 'C|', music: 'b3:q e4:h b3:q | e4:h. r:q | c4:q a4:h e4:q | a4:h. r:q' },
+        { title: 'Mixed', key: 'Eb', time: '3/4', music: 'b3:8. c4:16 e4:q c4:q | d4:q b4:h | b3:8. c4:16 d4:q a4:q | g4:h.' },
       ];
-      rows.forEach(([title, y, key, keys]) => {
-        label(overlay, title, 35, y - 8, { 'font-size': 20, 'font-weight': '700' });
-        drawStave(VF, context, { x: 45, y, width: 830, key, time: title === 'Conjunct' ? '4/4' : title === 'Disjunct' ? 'C' : '3/4', notes: keys.map((pitch, index) => ({ key: pitch, duration: index % 4 === 3 ? 'h' : 'q' })), formatWidth: 660, beams: title === 'Mixed' });
+      rows.forEach(({ title, key, time, music }, index) => {
+        const y = index * 165;
+        overlay.text(title, 2, y + 22, { 'font-size': 19 });
+        drawStave(VF, context, { x: 0, y: y + 10, width: 855, key, time, notes: melody(music), beams: true, formatWidth: 700 });
       });
     },
   },
@@ -604,16 +660,22 @@ export const definitions = [
     sources: ['2ce337631ea22e3e00c8bf33981c83c0374e0759.png'],
     output: 'auld-lang-syne-antecedent-consequent.svg',
     alt: 'Antecedent and consequent phrases of Auld Lang Syne, showing parallel rhythm but different melody and chord endings.',
-    width: 940,
-    height: 400,
+    width: 960,
+    height: 370,
     render({ VF, context, overlay }) {
-      const rhythm = ['g/4', 'c/5', 'c/5', 'e/5', 'd/5', 'c/5', 'd/5', 'e/5', 'c/5', 'a/4'];
-      label(overlay, 'Antecedent phrase', 45, 35, { fill: red, 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Chords: D                 A7                 D                 G', 135, 62, { 'font-weight': '700' });
-      drawStave(VF, context, { x: 45, y: 70, width: 850, key: 'D', time: '4/4', notes: rhythm.map((key, index) => ({ key, duration: index % 3 === 0 ? 'q' : '8' })), formatWidth: 680, beams: true });
-      label(overlay, 'Consequent phrase', 45, 225, { fill: blue, 'font-size': 20, 'font-weight': '700' });
-      label(overlay, 'Chords: D                 A7             Bm    Em7   A7       D', 135, 252, { 'font-weight': '700' });
-      drawStave(VF, context, { x: 45, y: 260, width: 850, key: 'D', time: '4/4', notes: rhythm.map((key, index) => ({ key: index > 6 ? ['b/3', 'a/3', 'd/4'][index - 7] : key, duration: index % 3 === 0 ? 'q' : '8' })), formatWidth: 680, beams: true });
+      const antecedent = [
+        ...melody('a3:q | d4:q. d4:8 d4:q f4:q | e4:q. d4:8 e4:q f4:q | d4:q. d4:8 f4:q a4:q | b4:h.', { color: red }),
+        ...melody('b4:q', { color: blue }),
+      ];
+      const consequent = melody('a4:q. f4:8 f4:q d4:q | e4:q. d4:8 e4:q f4:q | d4:q. b3:8 b3:q a3:q | d4:h.', { color: blue });
+      overlay.text('Antecedent Phrase', 0, 20, { fill: red, 'font-size': 20 });
+      const top = drawStave(VF, context, { x: 0, y: 40, width: 960, key: 'D', time: '4/4', notes: antecedent, formatWidth: 800 });
+      overlay.text('Consequent Phrase', 0, 200, { fill: blue, 'font-size': 20 });
+      const bottom = drawStave(VF, context, { x: 0, y: 220, width: 960, key: 'D', notes: consequent, formatWidth: 820, endBar: 'end' });
+      const chord = (item, name, y) => overlay.text(name, noteX(item), y, { 'font-size': 19, 'font-weight': '700', 'text-anchor': 'middle' });
+      overlay.text('Chords:', noteX(top.notes[2]) - 22, 58, { 'font-size': 19, 'font-weight': '700', 'text-anchor': 'end' });
+      [[2, 'D'], [7, 'A7'], [12, 'D'], [17, 'G']].forEach(([index, name]) => chord(top.notes[index], name, 58));
+      [[0, 'D'], [5, 'A7'], [10, 'Bm'], [12, 'Em7'], [13, 'A7'], [15, 'D']].forEach(([index, name]) => chord(bottom.notes[index], name, 238));
     },
   },
   {
@@ -622,12 +684,13 @@ export const definitions = [
     sources: ['61a817eace09793f5c3a9d046d4c08d0d04813fd.png'],
     output: 'beethoven-fate-motif.svg',
     alt: 'Beethoven’s four-note fate motif: three repeated short notes followed by a long lower note under a fermata.',
-    width: 650,
-    height: 240,
-    render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 65, width: 560, key: 'Eb', time: '2/4', notes: [{ rest: true, duration: '8' }, { key: 'g/4', duration: '8' }, { key: 'g/4', duration: '8' }, { key: 'g/4', duration: '8' }, { key: 'eb/4', duration: 'h' }], formatWidth: 390, beams: true });
-      label(overlay, '𝄐', 500, 42, { 'font-size': 34, 'text-anchor': 'middle' });
-      label(overlay, 'short – short – short – long', 325, 215, { 'font-size': 19, 'font-weight': '700', 'text-anchor': 'middle' });
+    width: 420,
+    height: 170,
+    render({ VF, context }) {
+      drawStave(VF, context, {
+        x: 0, y: 30, width: 420, key: 'Eb', time: '2/4', formatWidth: 240,
+        notes: melody('r:8 g4:8 g4:8 g4:8 | e4:h@'), beamGroups: [[1, 3]],
+      });
     },
   },
   {
@@ -654,14 +717,21 @@ export const definitions = [
     sources: ['04f1d4ac48717164428426cac4f806a7c27c9e16.png'],
     output: 'beethoven-ode-to-joy-theme.svg',
     alt: 'The four phrases of Beethoven’s Ode to Joy theme, including its repeated opening phrases and varied concluding phrase.',
-    width: 940,
-    height: 620,
-    render({ VF, context, overlay }) {
-      const base = ['b/4', 'b/4', 'c/5', 'd/5', 'd/5', 'c/5', 'b/4', 'a/4', 'g/4', 'g/4', 'a/4', 'b/4'];
-      const rows = [base, base, ['a/4', 'a/4', 'b/4', 'g/4', 'a/4', 'b/4', 'c/5', 'b/4', 'g/4', 'a/4', 'd/4'], base];
-      rows.forEach((keys, index) => {
-        drawStave(VF, context, { x: 45, y: 35 + index * 145, width: 850, time: index === 0 ? '4/4' : undefined, notes: keys.map((key, noteIndex) => ({ key, duration: noteIndex > keys.length - 3 ? 'h' : noteIndex % 5 === 4 ? '8' : 'q' })), formatWidth: 680, beams: true });
-        label(overlay, `Phrase ${index + 1}`, 70, 30 + index * 145, { fill: blue, 'font-weight': '700' });
+    width: 900,
+    height: 530,
+    render({ VF, context }) {
+      const opening = 'e4:q e4:q f4:q g4:q | g4:q f4:q e4:q d4:q | c4:q c4:q d4:q e4:q |';
+      const rows = [
+        { music: `${opening} e4:q. d4:8 d4:h` },
+        { music: `${opening} d4:q. c4:8 c4:h` },
+        { music: 'd4:q d4:q e4:q c4:q | d4:q e4:8 f4:8 e4:q c4:q | d4:q e4:8 f4:8 e4:q d4:q | c4:q d4:q g3:h', beamGroups: [[6, 7], [12, 13]] },
+        { music: `${opening} d4:q. c4:8 c4:h` },
+      ];
+      rows.forEach(({ music, beamGroups }, index) => {
+        drawStave(VF, context, {
+          x: 0, y: index * 128, width: 900, time: index === 0 ? '4/4' : undefined, formatWidth: index === 0 ? 780 : 800,
+          notes: melody(music, { stemDirection: 1 }), beamGroups,
+        });
       });
     },
   },

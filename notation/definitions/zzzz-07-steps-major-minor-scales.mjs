@@ -1,14 +1,48 @@
-import { drawKeyboard, drawStave, labelUnder, note } from '../figure-helpers.mjs';
+import { drawIntervalRows, drawKeyboard, drawMeasures, drawPiano, drawStave, labelUnder, melody, note, noteX, placeNotes } from '../figure-helpers.mjs';
 
 const RED = '#d32f2f';
 const BLUE = '#1565c0';
 
-function pitch(key, accidental) {
-  return accidental ? { key, duration: 'w', accidental } : { key, duration: 'w' };
+function pitch(key, accidental, duration = 'w') {
+  return accidental ? { key, duration, accidental } : { key, duration };
 }
 
-function scale(keys, accidentals = {}) {
-  return keys.map((key, index) => pitch(key, accidentals[index]));
+function scale(keys, accidentals = {}, duration = 'w') {
+  return keys.map((key, index) => pitch(key, accidentals[index], duration));
+}
+
+// Ascending-then-descending A minor forms, written as in the source figures.
+const aMinorUp = ['a/4', 'b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5', 'a/5'];
+const aMinorDown = ['g/5', 'f/5', 'e/5', 'd/5', 'c/5', 'b/4', 'a/4'];
+const aMinorForms = {
+  natural: ['A Natural Minor', {}, {}],
+  harmonic: ['A Harmonic Minor', { 6: '#' }, { 0: '(#)' }],
+  melodic: ['A Melodic Minor', { 5: '#', 6: '#' }, { 0: 'n', 1: 'n' }],
+  dorian: ['A Dorian Minor', { 5: '#' }, { 1: '(#)' }],
+};
+
+// Stacked staves, each with a title above it, written with the melody syntax.
+function drawTitledRows(VF, context, overlay, rows, { width = 900, rowHeight = 130, titleSize = 18, top = 0 } = {}) {
+  rows.forEach(({ title, music, key, clef = 'treble', time, beams }, index) => {
+    const y = top + index * rowHeight;
+    if (title) overlay.text(title, 4, y + 24, { 'font-size': titleSize });
+    drawStave(VF, context, {
+      x: 0, y: y + 6, width, clef, key, time, notes: melody(music), beams, formatWidth: width - 130,
+    });
+  });
+}
+
+function drawAMinorForms(VF, context, overlay, forms) {
+  forms.forEach((form, index) => {
+    const [title, up, down] = aMinorForms[form];
+    const y = 8 + index * 162;
+    overlay.text(title, 12, y + 22, { 'font-size': 19 });
+    drawStave(VF, context, {
+      x: 10, y: y + 22, width: 955,
+      notes: [...scale(aMinorUp, up, 'q'), ...scale(aMinorDown, down, 'q')],
+      formatWidth: 830,
+    });
+  });
 }
 
 function annotationArc(overlay, x1, x2, y, label, color = RED) {
@@ -29,6 +63,15 @@ function drawPatternScale(VF, context, overlay, { y, clef = 'treble', notes, lab
 function drawScaleRow(VF, context, overlay, { y, title, clef = 'treble', notes, width = 720 }) {
   if (title) overlay.text(title, 22, y + 2, { 'font-size': 16 });
   drawStave(VF, context, { x: 65, y: y + 6, width, clef, notes, formatWidth: width - 125 });
+}
+
+// Scale-writing solution pages: numbered titles over staves of quarter notes.
+function drawScaleSolutions(VF, context, overlay, rows, { width = 424, x = 58, spacing = 95 } = {}) {
+  rows.forEach(({ title, clef = 'treble', music }, index) => {
+    const top = index * spacing;
+    overlay.text(title, 0, top + 30, { 'font-size': 17, fill: '#222' });
+    drawStave(VF, context, { x, y: top + 10, width, clef, beginBar: 'none', endBar: 'none', formatWidth: width - 100, notes: melody(music) });
+  });
 }
 
 function drawScaleWorksheet(VF, context, overlay, rows) {
@@ -165,21 +208,42 @@ const melodicMinorRows = [
   melodicMinorRow('6. F sharp melodic minor', 'bass', ['f/2', 'g/2', 'a/2', 'b/2', 'c/3', 'd/3', 'e/3', 'f/3'], ['e/3', 'd/3', 'c/3', 'b/2', 'a/2', 'g/2', 'f/2'], { 0: '#', 1: '#', 4: '#', 5: '#', 6: '#', 7: '#' }, { 0: 'n', 1: 'n', 2: '#', 4: '#', 5: '#', 6: '#' }),
 ];
 
+const identifyStepExercise = [
+  { measures: [['d/4', 'f/4'], ['b/4', 'g/4'], ['c/4', ['g/4', '#']], [['e/5', 'b'], ['a/4', 'b']]], labels: ['3 half steps\n(1½ steps)', '4 half steps\n(2 whole steps)', '8 half steps\n(4 whole steps)', '7 half steps\n(3½ steps)'] },
+  { clef: 'bass', measures: [['f/2', ['b/2', 'b']], ['b/3', 'f/3'], ['b/2', ['f/3', '#']], ['a/3', 'c/3']], labels: ['5 half steps\n(2½ steps)', '6 half steps\n(3 whole steps)', '7 half steps\n(3½ whole steps)', '9 half steps\n(4½ steps)'] },
+];
+
+const intervalStepExercise = [
+  { measures: [['d/4', 'g/4'], ['c/5', ['b/4', 'b']], ['g/4', ['e/4', 'b']], ['a/4', 'c/4']], labels: ['5 half steps higher', '1 whole step lower', '2 whole steps lower', '9 half steps lower'] },
+  { measures: [[['d/4', 'b'], ['e/4', 'b']], ['d/5', ['d/5', 'b'], ['c/5', '(#)']], ['e/4', ['g/4', '#']], ['b/4', 'c/4']], labels: ['1 whole step higher', '1 half step lower', '2 whole steps higher', '11 half steps lower'] },
+  { clef: 'bass', measures: [['g/2', ['c/3', '#']], ['g/3', 'e/3'], [['c/3', 'b'], ['c/3', 'n']], ['e/3', 'a/2']], labels: ['3 whole steps higher', '3 half steps lower', '1 half step higher', '7 half steps lower'] },
+];
+
+// Seven-key keyboard (C to B) with windows cut into chosen black keys, as in the
+// half-step and whole-step figures. `windows` maps black-key index to label.
+function drawStepKeyboard(overlay, { labels, windows }) {
+  const { white, black } = drawPiano(overlay, { x: 2, y: 0, whiteWidth: 41.6, whiteHeight: 325, blackWidth: 30, blackHeight: 192, letters: false, stroke: 4 });
+  Object.entries(labels).forEach(([index, letter]) => overlay.text(letter, white[index], 294, { 'font-size': 17, 'text-anchor': 'middle', fill: '#333' }));
+  Object.entries(windows).forEach(([index, letter]) => {
+    overlay.path(`M ${black[index] - 16} 140 H ${black[index] + 16} V 175 H ${black[index] - 16} Z`, { fill: 'white', stroke: 'none' });
+    overlay.text(letter, black[index], 166, { 'font-size': 17, 'text-anchor': 'middle', fill: '#333' });
+  });
+  return { white, black };
+}
+
 export const definitions = [
   {
     id: 'keyboard-half-step-examples',
     sources: ['d82a33357abdd647d475688799c560541ab4b976.png'],
     output: 'keyboard-half-step-examples.svg',
     status: 'svg-overlay',
-    alt: 'Piano keyboard showing the half steps C to C sharp, E to F, and G sharp to A.',
-    width: 620, height: 330,
+    alt: 'Piano keyboard showing the half steps C to C sharp, E to F, and A to G sharp.',
+    width: 300, height: 330,
     render({ overlay }) {
-      drawKeyboard(overlay, { x: 50, y: 35, whiteWidth: 72, whiteHeight: 250, whiteKeys: 7, labels: ['C', 'D', 'E', 'F', 'G', 'A', 'B'] });
-      overlay.text('C\u266f / D\u266d', 122, 137, { fill: 'white', 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      overlay.text('G\u266f / A\u266d', 410, 137, { fill: 'white', 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      annotationArc(overlay, 82, 122, 245, 'half step');
-      annotationArc(overlay, 250, 300, 245, 'half step');
-      annotationArc(overlay, 410, 442, 245, 'half step');
+      drawStepKeyboard(overlay, { labels: { 0: 'C', 2: 'E', 3: 'F', 5: 'A' }, windows: { 0: 'C♯', 4: 'G♯' } });
+      overlay.path('M 18 268 Q 4 210 30 158', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
+      overlay.path('M 103 268 Q 125 250 148 268', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
+      overlay.path('M 234 270 Q 244 210 222 160', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
     },
   },
   {
@@ -199,10 +263,12 @@ export const definitions = [
     sources: ['5fc8361206735d496da5e05f44513098a36d8b3f.png'],
     output: 'ascending-chromatic-scale.svg', status: 'vexflow-overlay',
     alt: 'Ascending chromatic scale from C to C, with every interval a half step.',
-    width: 980, height: 210,
-    render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 35, y: 32, width: 910, notes: scale(['c/4', 'c/4', 'd/4', 'd/4', 'e/4', 'f/4', 'f/4', 'g/4', 'g/4', 'a/4', 'a/4', 'b/4', 'c/5'], { 1: '#', 3: '#', 6: '#', 8: '#', 10: '#' }), formatWidth: 760 });
-      overlay.text('Every adjacent pair is one half step apart.', 490, 180, { 'font-size': 16, 'text-anchor': 'middle' });
+    width: 640, height: 130,
+    render({ VF, context }) {
+      drawStave(VF, context, {
+        x: 0, y: 0, width: 640, formatWidth: 540,
+        notes: scale(['c/4', 'c/4', 'd/4', 'd/4', 'e/4', 'f/4', 'f/4', 'g/4', 'g/4', 'a/4', 'a/4', 'b/4', 'c/5'], { 1: '#', 3: '#', 6: '#', 8: '#', 10: '#' }, 'q'),
+      });
     },
   },
   {
@@ -210,15 +276,12 @@ export const definitions = [
     sources: ['c052d75a73aff6b5e19b0f59781c5dfc6a342b8a.png'],
     output: 'keyboard-whole-step-examples.svg', status: 'svg-overlay',
     alt: 'Piano keyboard showing the whole steps C to D, E to F sharp, and G sharp to A sharp.',
-    width: 620, height: 330,
+    width: 300, height: 330,
     render({ overlay }) {
-      drawKeyboard(overlay, { x: 50, y: 35, whiteWidth: 72, whiteHeight: 250, whiteKeys: 7, labels: ['C', 'D', 'E', 'F', 'G', 'A', 'B'] });
-      overlay.text('F\u266f / G\u266d', 338, 137, { fill: 'white', 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      overlay.text('G\u266f / A\u266d', 410, 137, { fill: 'white', 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      overlay.text('A\u266f / B\u266d', 482, 137, { fill: 'white', 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' });
-      annotationArc(overlay, 82, 154, 245, 'whole step');
-      annotationArc(overlay, 250, 338, 245, 'whole step');
-      annotationArc(overlay, 410, 482, 245, 'whole step');
+      drawStepKeyboard(overlay, { labels: { 0: 'C', 1: 'D', 2: 'E' }, windows: { 3: 'F♯', 4: 'G♯', 5: 'A♯' } });
+      overlay.path('M 22 268 Q 45 250 67 268', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
+      overlay.path('M 107 252 Q 118 190 152 153', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
+      overlay.path('M 200 143 Q 222 128 245 143', { fill: 'none', stroke: RED, 'stroke-width': 2.2 });
     },
   },
   {
@@ -238,115 +301,157 @@ export const definitions = [
     sources: ['f5abaf8d7b97faf6bf1cdfc22af3397be9807f33.png'],
     output: 'ascending-whole-tone-scale.svg', status: 'vexflow-overlay',
     alt: 'Ascending whole-tone scale from C to C using only whole steps.',
-    width: 800, height: 210,
-    render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 35, y: 32, width: 730, notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'c/5'], { 3: '#', 4: '#', 5: '#' }), formatWidth: 590 });
-      overlay.text('W        W        W        W        W        W', 435, 175, { 'font-size': 16, 'text-anchor': 'middle' });
+    width: 480, height: 130,
+    render({ VF, context }) {
+      drawStave(VF, context, {
+        x: 0, y: 0, width: 480, formatWidth: 380,
+        notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'c/5'], { 3: '#', 4: '#', 5: '#' }, 'q'),
+      });
     },
   },
   {
     id: 'five-half-steps-c-to-f',
     sources: ['a377eac1f99e6e98dbe1d2c0947a7626c7386da0.png'],
     output: 'five-half-steps-c-to-f.svg', status: 'vexflow-overlay',
-    alt: 'Chromatic notes from C to F divided into five numbered half steps.',
-    width: 780, height: 240,
+    alt: 'Chromatic notes from C to F, with red arcs numbering the five half steps between them.',
+    width: 450,
+    height: 135,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 35, y: 30, width: 710, notes: scale(['c/4', 'c/4', 'd/4', 'd/4', 'e/4', 'f/4'], { 1: '#', 3: '#' }), formatWidth: 530 });
-      for (let i = 0; i < 5; i += 1) annotationArc(overlay, 177 + i * 83, 218 + i * 83, 125, String(i + 1));
+      const { notes } = drawStave(VF, context, { x: 0, y: -10, width: 450, formatWidth: 280, endBar: 'none', notes: melody('c4:w c#4:w d4:w d#4:w e4:w f4:w') });
+      for (let i = 0; i < 5; i += 1) {
+        const [x1, x2] = [noteX(notes[i]) + 4, noteX(notes[i + 1]) - 4];
+        overlay.path(`M ${x1} 96 Q ${(x1 + x2) / 2} 108 ${x2} 96`, { fill: 'none', stroke: RED, 'stroke-width': 2 });
+        overlay.text(String(i + 1), (x1 + x2) / 2, 128, { fill: RED, 'font-size': 14, 'text-anchor': 'middle' });
+      }
     },
   },
   {
     id: 'identify-intervals-in-steps-practice',
     sources: ['accff92080af0b6693ce2be1cd6200a6dfcb4c3e.png'],
     output: 'identify-intervals-in-steps-practice.svg', status: 'vexflow-overlay',
-    alt: 'Eight pairs of whole notes in treble and bass clefs for identifying intervals in half and whole steps.',
-    width: 940, height: 395,
+    alt: 'Eight intervals in treble and bass clef for identifying the number of half steps and whole steps in each',
+    width: 970,
+    height: 360,
     render({ VF, context, overlay }) {
-      const rows = [
-        [[pitch('c/4'), pitch('e/4')], [pitch('c/5'), pitch('g/4')], [pitch('e/4'), pitch('c/4', '#')], [pitch('e/5', 'b'), pitch('a/4', 'b')]],
-        [[pitch('c/3'), pitch('e/3', 'b')], [pitch('c/4'), pitch('g/3')], [pitch('e/3'), pitch('f/3', '#')], [pitch('c/4'), pitch('f/3')]],
-      ];
-      drawIntervalMeasures(VF, context, overlay, rows, false);
+      drawIntervalRows(VF, context, overlay, identifyStepExercise.map(({ labels, ...row }) => row), { rowHeight: 190, labelOffset: 125 });
     },
   },
   {
     id: 'identify-intervals-in-steps-solutions',
     sources: ['00f13232da90fddc8e6cd6c5bf22411c54ba182f.png'],
     output: 'identify-intervals-in-steps-solutions.svg', status: 'vexflow-overlay',
-    alt: 'Solutions identifying eight intervals by their numbers of half steps and equivalent whole steps.',
-    width: 940, height: 455,
+    alt: 'Eight intervals in treble and bass clef, each labelled with its size in half steps and whole steps',
+    width: 970,
+    height: 395,
     render({ VF, context, overlay }) {
-      const rows = [
-        [[pitch('c/4'), pitch('e/4')], [pitch('c/5'), pitch('g/4')], [pitch('e/4'), pitch('c/4', '#')], [pitch('e/5', 'b'), pitch('a/4', 'b')]],
-        [[pitch('c/3'), pitch('e/3', 'b')], [pitch('c/4'), pitch('g/3')], [pitch('e/3'), pitch('f/3', '#')], [pitch('c/4'), pitch('f/3')]],
-      ];
-      drawIntervalMeasures(VF, context, overlay, rows, true);
+      drawIntervalRows(VF, context, overlay, identifyStepExercise, { rowHeight: 200, labelOffset: 125 });
     },
   },
   {
     id: 'complete-intervals-in-steps-practice',
+    status: 'vexflow-overlay',
     sources: ['ed35597f1a11d4911bcffeb59b94b7aa1357cfd1.png'],
-    output: 'complete-intervals-in-steps-practice.svg', status: 'vexflow-overlay',
-    alt: 'Twelve one-note interval exercises asking for a second note a specified number of half or whole steps higher or lower.',
-    width: 980, height: 590,
-    render({ VF, context, overlay }) { drawIntervalCompletion(VF, context, overlay, false); },
+    output: 'complete-intervals-in-steps-practice.svg',
+    alt: 'Twelve given notes with instructions such as five half steps higher, for writing a second note.',
+    width: 970,
+    height: 510,
+    render({ VF, context, overlay }) {
+      drawIntervalRows(VF, context, overlay, intervalStepExercise.map((row) => ({ ...row, measures: row.measures.map(([first]) => [first, { ghost: true }]) })), { rowHeight: 165, labelOffset: 122 });
+    },
   },
   {
     id: 'complete-intervals-in-steps-solutions',
+    status: 'vexflow-overlay',
     sources: ['e1166e2deee2765a28a25c97f18b7751aa6c4174.png'],
-    output: 'complete-intervals-in-steps-solutions.svg', status: 'vexflow-overlay',
-    alt: 'Completed set of twelve intervals raised or lowered by specified numbers of half and whole steps.',
-    width: 980, height: 590,
-    render({ VF, context, overlay }) { drawIntervalCompletion(VF, context, overlay, true); },
+    output: 'complete-intervals-in-steps-solutions.svg',
+    alt: 'Answers: each given note paired with the note the stated number of half or whole steps away.',
+    width: 970,
+    height: 510,
+    render({ VF, context, overlay }) {
+      drawIntervalRows(VF, context, overlay, intervalStepExercise, { rowHeight: 165, labelOffset: 122 });
+    },
   },
   {
     id: 'major-scale-step-pattern-examples',
     sources: ['31c995861b2dffd208346e79492b348278fc3c21.png'],
     output: 'major-scale-step-pattern-examples.svg', status: 'vexflow-overlay',
-    alt: 'C major, D major, and E flat major scales illustrating the whole-whole-half-whole-whole-whole-half pattern.',
-    width: 850, height: 520,
+    alt: 'C major, D major, and B flat major scales, each following the pattern whole, whole, half, whole, whole, whole, half.',
+    width: 572,
+    height: 300,
     render({ VF, context, overlay }) {
-      const labels = ['Whole\nStep', 'Whole\nStep', 'Half\nStep', 'Whole\nStep', 'Whole\nStep', 'Whole\nStep', 'Half\nStep'];
-      drawPatternScale(VF, context, overlay, { y: 15, notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5']), labels });
-      drawPatternScale(VF, context, overlay, { y: 180, notes: scale(['d/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5', 'd/5'], { 2: '#', 6: '#' }), labels: ['W', 'W', 'H', 'W', 'W', 'W', 'H'] });
-      drawPatternScale(VF, context, overlay, { y: 345, clef: 'bass', notes: scale(['e/2', 'f/2', 'g/2', 'a/2', 'b/2', 'c/3', 'd/3', 'e/3'], { 0: 'b', 3: 'b', 4: 'b', 7: 'b' }), labels: [] });
+      const pattern = ['W', 'W', 'H', 'W', 'W', 'W', 'H'];
+      const vee = (x, y) => overlay.path(`M ${x - 9} ${y - 5} L ${x} ${y + 5} L ${x + 9} ${y - 5}`, { fill: 'none', stroke: RED, 'stroke-width': 1.6 });
+      [
+        { y: -19, clef: 'treble', music: 'c4 d4 e4 f4 g4 a4 b4 c5', veeY: 76, words: true },
+        { y: 103, clef: 'treble', music: 'd4 e4 f#4 g4 a4 b4 c#5 d5', veeY: 197, words: false },
+        { y: 213, clef: 'bass', music: 'bb2 c3 d3 eb3 f3 g3 a3 bb3' },
+      ].forEach(({ y, clef, music, veeY, words }) => {
+        const { notes } = drawStave(VF, context, { x: 0, y, width: 572, clef, beginBar: 'none', endBar: 'none', formatWidth: 460, notes: melody(music) });
+        if (!veeY) return;
+        pattern.forEach((step, index) => {
+          const x = (noteX(notes[index]) + noteX(notes[index + 1])) / 2 + 10;
+          vee(x, veeY);
+          const text = words ? `${step === 'W' ? 'Whole' : 'Half'}\nStep` : step;
+          overlay.text(text, x, veeY + 26, { 'font-size': 15, 'text-anchor': 'middle', 'data-line-height': 20, fill: '#333' });
+        });
+      });
     },
   },
   {
     id: 'major-scale-starting-notes-practice',
     sources: ['5fe66d86c6389d14990425c15ae7fb3b3a57697a.png'],
     output: 'major-scale-starting-notes-practice.svg', status: 'vexflow-overlay',
-    alt: 'Eight starting notes for writing C, G, B flat, C sharp, F sharp, G flat, D, and D flat major scales.',
-    width: 790, height: 330,
+    alt: 'Eight numbered staves each giving the first note of a major scale to write: F, G, A flat, B, F sharp, G flat, and in bass clef A and C flat.',
+    width: 461,
+    height: 180,
     render({ VF, context, overlay }) {
-      drawStartingNotes(VF, context, overlay, [
-        { note: pitch('c/4') }, { note: pitch('g/4') }, { note: pitch('b/3', 'b') }, { note: pitch('c/4', '#') },
-        { note: pitch('f/4', '#') }, { note: pitch('g/4', 'b') }, { clef: 'bass', note: pitch('d/2') }, { clef: 'bass', note: pitch('d/2', 'b') },
-      ]);
+      [
+        [0, -19, 'treble', 'f4', 49], [127, -19, 'treble', 'g4', 180], [249, -19, 'treble', 'ab4', 307], [369, -19, 'treble', 'b3', 424],
+        [2, 72, 'treble', 'f#4', 62], [129, 72, 'treble', 'gb4', 187], [252, 72, 'bass', 'a2', 296], [371, 72, 'bass', 'cb3', 429],
+      ].forEach(([x, y, clef, pitch, noteX], index) => {
+        placeNotes(VF, context, { x, y, width: 91, clef, beginBar: 'none', items: [{ x: noteX, music: `${pitch}:q` }] });
+        overlay.text(`${index + 1}.`, x, y + 29, { 'font-size': 11 });
+      });
     },
   },
   {
     id: 'major-scale-writing-solutions',
     sources: ['33960a69fd3a1c138c9f46079f7a2c93120c758b.png'],
     output: 'major-scale-writing-solutions.svg', status: 'vexflow-overlay',
-    alt: 'Ascending C, G, B flat, C sharp, F sharp, G flat, D, and D flat major scales with accidentals.',
-    width: 850, height: 1040,
-    render({ VF, context, overlay }) { drawScaleWorksheet(VF, context, overlay, majorWorksheetRows); },
+    alt: 'Ascending F, G, A flat, B, F sharp, and G flat major scales in treble clef and A and C flat major scales in bass clef.',
+    width: 455, height: 710,
+    render({ VF, context, overlay }) {
+      [
+        ['treble', 'f4 g4 a4 bb4 c5 d5 e5 f5'], ['treble', 'g4 a4 b4 c5 d5 e5 f#5 g5'], ['treble', 'ab4 bb4 c5 db5 eb5 f5 g5 ab5'],
+        ['treble', 'b3 c#4 d#4 e4 f#4 g#4 a#4 b4'], ['treble', 'f#4 g#4 a#4 b4 c#5 d#5 e#5 f#5'], ['treble', 'gb4 ab4 bb4 cb5 db5 eb5 f5 gb5'],
+        ['bass', 'a2 b2 c#3 d3 e3 f#3 g#3 a3'], ['bass', 'cb3 db3 eb3 fb3 gb3 ab3 bb3 cb4'],
+      ].forEach(([clef, music], index) => {
+        const y = index * 88;
+        overlay.text(`${index + 1}.`, 4, y + 20, { 'font-size': 12 });
+        drawStave(VF, context, { x: 5, y: y - 8, width: 450, clef, beginBar: 'none', endBar: 'none', formatWidth: 345, notes: melody(music) });
+      });
+    },
   },
   {
     id: 'enharmonic-f-sharp-g-flat-major-keyboard',
     sources: ['f01bba67e1e7c2db689d526b14cff7a4a3ff2731.png'],
     output: 'enharmonic-f-sharp-g-flat-major-keyboard.svg', status: 'svg-overlay',
-    alt: 'Piano keyboard labeling the same keys with the enharmonic spellings of F sharp major and G flat major.',
-    width: 760, height: 390,
+    alt: 'Piano keyboard labeling the same keys with the enharmonic spellings of F sharp major (red) and G flat major (blue).',
+    width: 450, height: 332,
     render({ overlay }) {
-      drawKeyboard(overlay, { x: 40, y: 30, whiteWidth: 62, whiteHeight: 300, whiteKeys: 11, labels: [] });
-      const positions = [75, 102, 164, 226, 253, 315, 377, 404, 466, 528, 555, 617];
-      const sharpNames = ['F\u266f', 'G\u266f', 'A\u266f', 'B', 'C\u266f', 'D\u266f', 'E\u266f', 'F\u266f', 'G\u266f'];
-      const flatNames = ['G\u266d', 'A\u266d', 'B\u266d', 'C\u266d', 'D\u266d', 'E\u266d', 'F', 'G\u266d'];
-      sharpNames.forEach((name, index) => overlay.text(name, positions[index], 145 + (index % 2) * 25, { fill: RED, 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' }));
-      flatNames.forEach((name, index) => overlay.text(name, positions[index + 1], 205 + (index % 2) * 25, { fill: BLUE, 'font-size': 15, 'font-weight': '700', 'text-anchor': 'middle' }));
-      overlay.text('red: F\u266f major spellings    blue: G\u266d major spellings', 380, 370, { 'font-size': 16, 'text-anchor': 'middle' });
+      const { white, black } = drawPiano(overlay, { x: 5, y: 2, start: 'F', count: 11, whiteWidth: 40, whiteHeight: 325, blackWidth: 30, blackHeight: 190, letters: false, stroke: 5 });
+      // Each labelled black key has a white window with the sharp name over the flat name.
+      const pair = (x, top, sharp, flat) => {
+        overlay.text(sharp, x - 2, top + 22, { fill: RED, 'font-size': 16, 'text-anchor': 'middle' });
+        overlay.line(x - 18, top + 42, x + 18, top + 26, { stroke: '#111', 'stroke-width': 1.5 });
+        overlay.text(flat, x + 2, top + 49, { fill: BLUE, 'font-size': 16, 'text-anchor': 'middle' });
+      };
+      [[0, 'F♯', 'G♭'], [1, 'G♯', 'A♭'], [2, 'A♯', 'B♭'], [4, 'C♯', 'D♭'], [5, 'D♯', 'E♭'], [7, 'F♯', 'G♭']].forEach(([index, sharp, flat]) => {
+        overlay.path(`M ${black[index] - 15} 85 H ${black[index] + 15} V 150 H ${black[index] - 15} Z`, { fill: 'white', stroke: 'none' });
+        pair(black[index], 88, sharp, flat);
+      });
+      pair(white[3] - 5, 200, 'B', 'C♭');
+      pair(white[7] - 12, 200, 'E♯', 'F');
     },
   },
   {
@@ -422,11 +527,13 @@ export const definitions = [
     sources: ['b0cd8d8b9bbd822479fb9d5033b13dec772f8974.png'],
     output: 'c-major-c-minor-e-flat-major-comparison.svg', status: 'vexflow-overlay',
     alt: 'C major with no sharps or flats, C minor with three flats, and E flat major with the same three-flat key signature.',
-    width: 900, height: 500,
+    width: 640, height: 355,
     render({ VF, context, overlay }) {
-      drawScaleRow(VF, context, overlay, { y: 10, title: 'C major: no flats or sharps', notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5']), width: 790 });
-      drawScaleRow(VF, context, overlay, { y: 165, title: 'C minor: three flats', notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5'], { 2: 'b', 5: 'b', 6: 'b' }), width: 790 });
-      drawScaleRow(VF, context, overlay, { y: 320, title: 'E flat major: three flats', notes: scale(['e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5', 'd/5', 'e/5'], { 0: 'b', 3: 'b', 4: 'b', 7: 'b' }), width: 790 });
+      drawTitledRows(VF, context, overlay, [
+        { title: 'C major: no flats or sharps', music: 'c4 d4 e4 f4 g4 a4 b4 c5' },
+        { title: 'C minor: three flats', key: 'Eb', music: 'c4 d4 e4 f4 g4 a4 b4 c5' },
+        { title: 'E flat major: three flats', key: 'Eb', music: 'e4 f4 g4 a4 b4 c5 d5 e5' },
+      ], { width: 640, rowHeight: 118, titleSize: 17 });
     },
   },
   {
@@ -434,13 +541,9 @@ export const definitions = [
     sources: ['a1f2ff78adb5c4959eb1646d233b415623c18b62.png'],
     output: 'a-natural-harmonic-melodic-minor-comparison.svg', status: 'vexflow-overlay',
     alt: 'Ascending and descending A natural, harmonic, and melodic minor scales showing their differing sixth and seventh degrees.',
-    width: 980, height: 530,
+    width: 980, height: 500,
     render({ VF, context, overlay }) {
-      const up = ['a/4', 'b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5', 'a/5'];
-      const down = ['g/5', 'f/5', 'e/5', 'd/5', 'c/5', 'b/4', 'a/4'];
-      drawScaleRow(VF, context, overlay, { y: 10, title: 'A Natural Minor', notes: [...scale(up), ...scale(down)], width: 860 });
-      drawScaleRow(VF, context, overlay, { y: 175, title: 'A Harmonic Minor', notes: [...scale(up, { 6: '#' }), ...scale(down, { 0: '#' })], width: 860 });
-      drawScaleRow(VF, context, overlay, { y: 340, title: 'A Melodic Minor', notes: [...scale(up, { 5: '#', 6: '#' }), ...scale(down, { 0: 'n', 1: 'n' })], width: 860 });
+      drawAMinorForms(VF, context, overlay, ['natural', 'harmonic', 'melodic']);
     },
   },
   {
@@ -448,8 +551,17 @@ export const definitions = [
     sources: ['e1b491fc3b7d78fbc33815435de84ee7f561d5a6.png'],
     output: 'harmonic-minor-scale-writing-solutions.svg', status: 'vexflow-overlay',
     alt: 'Ascending A, G, B flat, E, F, and F sharp harmonic minor scales with raised seventh degrees.',
-    width: 850, height: 790,
-    render({ VF, context, overlay }) { drawScaleWorksheet(VF, context, overlay, harmonicMinorRows); },
+    width: 490, height: 580,
+    render({ VF, context, overlay }) {
+      drawScaleSolutions(VF, context, overlay, [
+        { title: '1.  A  harmonic minor', music: 'a4 b4 c5 d5 e5 f5 g#5 a5' },
+        { title: '2. G harmonic minor', music: 'g4 a4 bb4 c5 d5 eb5 f#5 g5' },
+        { title: '3. B flat harmonic minor', music: 'bb3 c4 db4 eb4 f4 gb4 a4 b(b)4' },
+        { title: '4. E harmonic minor', music: 'e4 f#4 g4 a4 b4 c5 d#5 e5' },
+        { title: '5. F harmonic minor', clef: 'bass', music: 'f2 g2 ab2 bb2 c3 db3 e3 f3' },
+        { title: '6. F sharp harmonic minor', clef: 'bass', music: 'f#2 g#2 a2 b2 c#3 d3 e#3 f(#)3' },
+      ]);
+    },
   },
   {
     id: 'melodic-minor-scale-writing-solutions',
@@ -464,10 +576,10 @@ export const definitions = [
     sources: ['6ea761be1de458aa09f079da4fad0c8242e99384.png'],
     output: 'dorian-minor-step-pattern.svg', status: 'vexflow-overlay',
     alt: 'Ascending D Dorian scale on the natural notes, labeled whole-half-whole-whole-whole-half-whole.',
-    width: 820, height: 230,
+    width: 560, height: 140,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 35, y: 25, width: 750, notes: scale(['d/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5', 'd/5']), formatWidth: 610 });
-      labelUnder(overlay, ['W', 'H', 'W', 'W', 'W', 'H', 'W'], 180, 75, 180, { 'font-size': 16 });
+      const { notes } = drawStave(VF, context, { x: 0, y: 0, width: 560, formatWidth: 440, notes: melody('d4 e4 f4 g4 a4 b4 c5 d5') });
+      ['W', 'H', 'W', 'W', 'W', 'H', 'W'].forEach((step, index) => overlay.text(step, (noteX(notes[index]) + noteX(notes[index + 1])) / 2, 128, { 'font-size': 15, 'text-anchor': 'middle' }));
     },
   },
   {
@@ -486,14 +598,9 @@ export const definitions = [
     sources: ['a9d8197d91fd07725f686061378aee0f88ed1d8f.png'],
     output: 'a-minor-types-with-dorian-comparison.svg', status: 'vexflow-overlay',
     alt: 'A natural, harmonic, melodic, and Dorian minor scales compared in ascending and descending form.',
-    width: 980, height: 690,
+    width: 980, height: 660,
     render({ VF, context, overlay }) {
-      const up = ['a/4', 'b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5', 'a/5'];
-      const down = ['g/5', 'f/5', 'e/5', 'd/5', 'c/5', 'b/4', 'a/4'];
-      drawScaleRow(VF, context, overlay, { y: 5, title: 'A Natural Minor', notes: [...scale(up), ...scale(down)], width: 860 });
-      drawScaleRow(VF, context, overlay, { y: 165, title: 'A Harmonic Minor', notes: [...scale(up, { 6: '#' }), ...scale(down, { 0: '#' })], width: 860 });
-      drawScaleRow(VF, context, overlay, { y: 325, title: 'A Melodic Minor', notes: [...scale(up, { 5: '#', 6: '#' }), ...scale(down, { 0: 'n', 1: 'n' })], width: 860 });
-      drawScaleRow(VF, context, overlay, { y: 485, title: 'A Dorian Minor', notes: [...scale(up, { 5: '#' }), ...scale(down, { 1: '#' })], width: 860 });
+      drawAMinorForms(VF, context, overlay, ['natural', 'harmonic', 'melodic', 'dorian']);
     },
   },
 ];

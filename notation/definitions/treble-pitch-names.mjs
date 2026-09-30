@@ -1,15 +1,23 @@
+import { arrowLine, drawNamedStaff } from '../figure-helpers.mjs';
+
+const columns = [120, 181, 237, 290, 340, 395, 447, 503, 560, 612, 664, 719, 770];
+
 export const definition = {
   id: 'treble-pitch-names',
   sources: ['847e7d248b6177b8cf0144658beed19346001782.png'],
   output: 'treble-pitch-names.svg',
-  alt: 'A treble clef staff labelled with ascending note names from C through A above and below the staff.',
-  width: 760,
-  height: 220,
-  render({ VF, context, overlay }) {
-    new VF.Stave(55, 65, 650).addClef('treble').setContext(context).draw();
-    overlay.text('Treble Clef\nSymbol', 45, 20, { 'text-anchor': 'middle', 'font-size': 17 });
-    [['C', 142, 165], ['D', 183, 151], ['E', 224, 137], ['F', 265, 123], ['G', 306, 109], ['A', 347, 95], ['B', 388, 81], ['C', 429, 67], ['D', 470, 53], ['E', 511, 39], ['F', 552, 25], ['G', 593, 11], ['A', 634, -3]].forEach(([name, x, y]) => overlay.text(name, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
-    overlay.text('etc.', 35, 205, { 'font-size': 16 });
-    overlay.text('etc.', 680, 24, { 'font-size': 16 });
+  alt: 'A treble clef staff labelled with ascending note names from C below the staff through A above it.',
+  width: 900,
+  height: 260,
+  render({ overlay }) {
+    overlay.text('Treble Clef\nSymbol', 8, 20, { 'font-size': 19, 'data-line-height': 25 });
+    drawNamedStaff(overlay, {
+      top: 77, clef: 'treble',
+      entries: ['C', 'D', 'E', 'F', 'G', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'A'].map((letter, index) => ({ letter, x: columns[index], step: index - 2 })),
+    });
+    overlay.text('etc.', 6, 252, { 'font-size': 19 });
+    arrowLine(overlay, 88, 224, 52, 240);
+    overlay.text('etc.', 862, 38, { 'font-size': 19 });
+    arrowLine(overlay, 808, 46, 846, 34);
   },
 };

@@ -12,6 +12,33 @@ const namespace = 'http://www.w3.org/2000/svg';
 const bravuraSource = fs.readFileSync(path.join(root, 'node_modules', 'vexflow', 'build', 'esm', 'src', 'fonts', 'bravura.js'), 'utf8');
 const bravuraDataUri = bravuraSource.match(/export const Bravura = '([^']+)'/)?.[1];
 if (!bravuraDataUri) throw new Error('Unable to load VexFlow Bravura font.');
+// Advance width and vertical extent of each SMuFL glyph in the Bravura font
+// VexFlow embeds, in font units. VexFlow sizes clefs, noteheads, accidentals,
+// and time signatures from these metrics, so they must match the real font.
+const bravuraMetrics = JSON.parse(fs.readFileSync(path.join(root, 'notation', 'bravura-metrics.json'), 'utf8'));
+
+function measureText(font, text) {
+  const size = font.match(/([\d.]+)(pt|px)/);
+  const px = size ? Number(size[1]) * (size[2] === 'pt' ? 4 / 3 : 1) : 16;
+  const scale = px / bravuraMetrics.unitsPerEm;
+  let width = 0;
+  let ascent = 0;
+  let descent = 0;
+  for (const character of text) {
+    const glyph = bravuraMetrics.glyphs[character.codePointAt(0).toString(16)];
+    if (glyph) {
+      width += glyph[0] * scale;
+      ascent = Math.max(ascent, glyph[1] * scale);
+      descent = Math.max(descent, -glyph[2] * scale);
+    } else {
+      // Plain text: an average sans-serif advance is close enough for layout.
+      width += px * (/[\s.,:;'!|il]/.test(character) ? 0.3 : 0.56);
+      ascent = Math.max(ascent, px * 0.72);
+      descent = Math.max(descent, px * 0.2);
+    }
+  }
+  return { width, actualBoundingBoxAscent: ascent, actualBoundingBoxDescent: descent };
+}
 
 function element(document, name, attributes = {}, content) {
   const node = document.createElementNS(namespace, name);
@@ -37,6 +64,8 @@ function createOverlay(document, svg) {
         y: y + index * Number(attributes['data-line-height'] ?? 22),
         'font-family': 'system-ui, sans-serif',
         'font-size': 16,
+        // The VexFlow root sets stroke="black"; text must not inherit it.
+        stroke: 'none',
         ...attributes,
         'data-line-height': undefined,
       }, line));
@@ -68,11 +97,7 @@ function render(definition) {
   // the static renderer dependency-free and make layout repeatable in CI.
   dom.window.HTMLCanvasElement.prototype.getContext = () => ({
     font: '',
-    measureText: (text) => ({
-      width: String(text).length * 8,
-      actualBoundingBoxAscent: 10,
-      actualBoundingBoxDescent: 3,
-    }),
+    measureText(text) { return measureText(this.font, String(text)); },
   });
   try {
     const host = dom.window.document.getElementById('score');
