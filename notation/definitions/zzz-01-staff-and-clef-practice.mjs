@@ -81,29 +81,44 @@ export const definitions = [
     id: 'orchestral-score-layout',
     sources: ['579422782a5ef1c8596ec806f11e71503cd314d1.png'],
     output: 'orchestral-score-layout.svg',
-    alt: 'An orchestral score with labelled woodwind, brass, percussion, and string staves aligned in a system.',
+    alt: 'The opening four measures of an orchestral score in 2/4: woodwind, brass, and timpani staves rest while clarinets and strings play the G G G E-flat, F F F D motif with fermatas on the half notes.',
     width: 920,
-    height: 1020,
+    height: 1050,
     render({ VF, context, overlay }) {
-      const parts = [
-        ['Flutes', 'treble'], ['Oboes', 'treble'], ['Clarinets in B♭', 'treble'], ['Bassoons', 'bass'],
-        ['Horns in F', 'treble'], ['Trumpets in C', 'treble'], ['Timpani in G', 'bass'],
-        ['Violin I', 'treble'], ['Violin II', 'treble'], ['Viola', 'alto'], ['Violoncello', 'bass'], ['Contrabass', 'bass'],
+      // Opening of Beethoven's Fifth: G G G E-flat / F F F D, with the clarinets a step higher in written pitch.
+      const restKey = { treble: 'b/4', bass: 'd/3', alto: 'c/4' };
+      const phrase = (pitches, clef, extra = {}) => [
+        { rest: true, key: restKey[clef], duration: '8' }, { key: pitches[0], duration: '8' }, { key: pitches[0], duration: '8' }, { key: pitches[0], duration: '8' },
+        { bar: 'single' }, { key: pitches[1], duration: 'h', fermata: true, ...extra }, { bar: 'single' },
+        { rest: true, key: restKey[clef], duration: '8' }, { key: pitches[2], duration: '8' }, { key: pitches[2], duration: '8' }, { key: pitches[2], duration: '8' },
+        { bar: 'single' }, { key: pitches[3], duration: 'h', ...extra },
       ];
-      parts.forEach(([label, clef], index) => {
+      const silent = (clef) => [0, 1, 2, 3].flatMap((index) => [...(index ? [{ bar: 'single' }] : []), { rest: true, key: restKey[clef], duration: 'w' }]);
+      const parts = [
+        ['Flutes', 'treble', 'Cm'], ['Oboes', 'treble', 'Cm'], ['Clarinets in B♭', 'treble', 'Dm', ['a/4', 'f/4', 'g/4', 'e/4']], ['Bassoons', 'bass', 'Cm'],
+        ['Horns in E♭', 'treble', 'C'], ['Trumpets in C', 'treble', 'C'], ['Timpani in C G', 'treble', 'C'],
+        ['Violin I', 'treble', 'Cm', ['g/4', 'e/4', 'f/4', 'd/4'], true], ['Violin II', 'treble', 'Cm', ['g/4', 'e/4', 'f/4', 'd/4'], true],
+        ['Viola', 'alto', 'Cm', ['g/3', 'e/3', 'f/3', 'd/3'], true], ['Violoncello', 'bass', 'Cm', ['g/3', 'e/3', 'f/3', 'd/3'], true],
+        ['Contrabass', 'bass', 'Cm', ['g/3', 'e/3', 'f/3', 'd/3'], true],
+      ];
+      parts.forEach(([label, clef, key, pitches, dynamic], index) => {
         const y = 22 + index * 80;
-        const hasPhrase = [2, 7, 8, 9, 10, 11].includes(index);
-        drawStave(VF, context, {
-          x: 180, y, width: 700, clef, key: 'D', time: index === 0 ? '3/4' : undefined,
-          notes: hasPhrase
-            ? ['d/4', 'e/4', 'f/4', 'a/4', 'g/4', 'e/4'].map((key) => ({ key, duration: 'q' }))
-            : [{ rest: true, duration: 'w' }, { rest: true, duration: 'w' }, { rest: true, duration: 'w' }],
-          formatWidth: 540,
+        const { notes } = drawStave(VF, context, {
+          x: 180, y, width: 700, clef, key, time: '2/4',
+          notes: pitches ? phrase(pitches, clef) : silent(clef),
+          formatWidth: 540, beams: true,
         });
-        overlay.text(label, 155, y + 52, { 'font-size': 15, 'font-weight': '700', 'text-anchor': 'end' });
+        if (pitches) {
+          const tied = notes[notes.length - 1];
+          const x = noteX(tied);
+          const ty = tied.getYs()[0] + 12;
+          overlay.path(`M ${x + 4} ${ty} Q ${x + 34} ${ty + 12} ${x + 70} ${ty}`, { fill: 'none', stroke: '#111', 'stroke-width': 1.6 });
+        }
+        if (dynamic) overlay.text('ff', noteX(notes[1]) - 6, y + 104, { 'font-size': 16, 'font-weight': '700', 'font-style': 'italic' });
+        overlay.text(label, 155, y + 64, { 'font-size': 15, 'font-weight': '700', 'text-anchor': 'end' });
       });
-      overlay.line(174, 62, 174, 962, { stroke: '#111', 'stroke-width': 3 });
-      overlay.text('All staves are read together from left to right', 520, 1000, { 'font-size': 17, 'text-anchor': 'middle' });
+      overlay.line(174, 42, 174, 982, { stroke: '#111', 'stroke-width': 3 });
+      overlay.text('All staves are read together from left to right', 520, 1035, { 'font-size': 17, 'text-anchor': 'middle' });
     },
   },
   {
@@ -115,11 +130,11 @@ export const definitions = [
     height: 440,
     render({ VF, context, overlay }) {
       drawStave(VF, context, { x: 55, y: 50, width: 700 });
-      [['E', 190, 154], ['G', 295, 134], ['B', 400, 114], ['D', 505, 94], ['F', 610, 74]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
+      [['E', 190, 136], ['G', 295, 126], ['B', 400, 116], ['D', 505, 106], ['F', 610, 96]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
       overlay.text('Treble-clef lines: “Every Good Boy Does Fine”', 410, 200, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
       overlay.text('or “Every Good Boy Deserves Fudge”', 410, 228, { fill: '#1769aa', 'font-size': 17, 'text-anchor': 'middle' });
       drawStave(VF, context, { x: 55, y: 270, width: 700 });
-      [['F', 235, 364], ['A', 350, 344], ['C', 465, 324], ['E', 580, 304]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
+      [['F', 235, 351], ['A', 350, 341], ['C', 465, 331], ['E', 580, 321]].forEach(([v, x, y]) => overlay.text(v, x, y, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' }));
       overlay.text('Treble-clef spaces spell “FACE”', 410, 425, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
     },
   },
@@ -151,12 +166,14 @@ export const definitions = [
     width: 860,
     height: 390,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 45, width: 770, clef: 'french' });
-      labelUnder(overlay, ['G', 'A', 'B', 'C', 'D'], 210, 95, 150, { 'font-weight': '700' });
-      overlay.text('etc.', 745, 67, { 'font-size': 16 });
+      // G clef on the middle line and F clef on the middle line; labels ride up the staff.
+      drawStave(VF, context, { x: 45, y: 45, width: 770, clef: null });
+      overlay.text('\uE050', 52, 105, { 'font-family': 'Bravura', 'font-size': 40 });
+      [['G', 105], ['A', 100], ['B', 95], ['C', 90], ['D', 85]].forEach(([label, y], index) => overlay.text(label, 210 + index * 95, y + 5, { 'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle', stroke: '#fff', 'stroke-width': 6, 'paint-order': 'stroke' }));
+      overlay.text('etc.', 745, 75, { 'font-size': 16 });
       drawStave(VF, context, { x: 45, y: 220, width: 770, clef: 'baritone-f' });
-      labelUnder(overlay, ['F', 'G', 'A', 'B', 'C'], 210, 95, 325, { 'font-weight': '700' });
-      overlay.text('etc.', 745, 242, { 'font-size': 16 });
+      [['F', 280], ['G', 275], ['A', 270], ['B', 265], ['C', 260]].forEach(([label, y], index) => overlay.text(label, 210 + index * 95, y + 5, { 'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle', stroke: '#fff', 'stroke-width': 6, 'paint-order': 'stroke' }));
+      overlay.text('etc.', 745, 250, { 'font-size': 16 });
       overlay.text('The G and F clefs were once movable.', 430, 382, { 'font-size': 18, 'text-anchor': 'middle' });
     },
   },
@@ -166,13 +183,23 @@ export const definitions = [
     output: 'same-melody-treble-and-bass.svg',
     alt: 'The same melody written in treble and bass clefs, illustrating excessive ledger lines in each clef.',
     width: 980,
-    height: 400,
+    height: 420,
     render({ VF, context, overlay }) {
-      const pitches = ['c/5', 'e/5', 'g/5', 'a/5', 'g/5', 'e/5', 'c/5', 'd/5', 'e/5', 'g/5', 'f/5', 'e/5', 'd/5', 'c/5'];
-      drawStave(VF, context, { x: 45, y: 45, width: 890, clef: 'treble', time: 'C', notes: pitches.map((key) => ({ key, duration: '8' })), formatWidth: 720, beams: true });
-      drawStave(VF, context, { x: 45, y: 225, width: 890, clef: 'bass', time: 'C', notes: pitches.map((key) => ({ key, duration: '8' })), formatWidth: 720, beams: true });
+      // Pickup, then four measures: B | E D C B E | A F# E D E F# | G E A G E D | E (dotted half). Key of G major.
+      const q = (key) => ({ key, duration: 'q' });
+      const e = (key) => ({ key, duration: '8' });
+      const bar = { bar: 'single' };
+      const pitches = [
+        q('b/4'), bar,
+        q('e/5'), e('d/5'), e('c/5'), q('b/4'), q('e/4'), bar,
+        q('a/4'), e('f/4'), e('e/4'), q('d/4'), e('e/4'), e('f/4'), bar,
+        e('g/4'), e('e/4'), e('a/4'), e('g/4'), q('e/4'), q('d/4'), bar,
+        { key: 'e/4', duration: 'h', dots: 1 },
+      ];
+      drawStave(VF, context, { x: 45, y: 45, width: 890, clef: 'treble', key: 'G', time: 'C', notes: pitches, formatWidth: 720, beams: true });
+      drawStave(VF, context, { x: 45, y: 250, width: 890, clef: 'bass', key: 'G', time: 'C', notes: pitches, formatWidth: 720, beams: true });
       overlay.text('Treble clef', 80, 30, { 'font-size': 17, 'font-weight': '700' });
-      overlay.text('Bass clef—the same sounding pitches require many ledger lines', 80, 210, { 'font-size': 17, 'font-weight': '700' });
+      overlay.text('Bass clef—the same sounding pitches require many ledger lines', 80, 215, { 'font-size': 17, 'font-weight': '700' });
     },
   },
   {

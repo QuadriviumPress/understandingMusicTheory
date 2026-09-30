@@ -1,38 +1,44 @@
 import { arrowLine, drawMeasures, drawRhythmEquation, drawStave, labelUnder, melody, note, noteX } from '../figure-helpers.mjs';
 
-function box(overlay, x, y, width = 150, height = 78) {
-  overlay.path(`M ${x} ${y} H ${x + width} V ${y + height} H ${x} Z`, { fill: 'none', stroke: '#555', 'stroke-width': 1.5 });
-}
+const red = '#d32f2f';
 
-function drawSymbolNote(overlay, x, y, value = 'quarter', color = '#111') {
-  const hollow = value === 'whole' || value === 'half';
-  overlay.ellipse(x, y, 9, 6, { fill: hollow ? 'white' : color, stroke: color, 'stroke-width': 2, transform: `rotate(-18 ${x} ${y})` });
-  if (value !== 'whole') overlay.line(x + 8, y, x + 8, y - 42, { stroke: color, 'stroke-width': 2.5 });
-  if (value === 'eighth') overlay.path(`M ${x + 8} ${y - 42} Q ${x + 30} ${y - 30} ${x + 16} ${y - 12}`, { fill: 'none', stroke: color, 'stroke-width': 2.5 });
-}
+// Worksheet laid out at the original 440 x 260 pixel scale. Each entry: equation items, then
+// the text runs, then the red answer (shown only in the solutions).
+const durationRows = [
+  { headY: 30, items: [{ x: 33, music: 'f4:w' }, { x: 65, text: '=' }, { box: [83, 190], top: 8, bottom: 52 }],
+    answer: { headY: 45, items: [{ x: 99, music: 'f4:q f4:q f4:q f4:q', spacing: 24 }] } },
+  { headY: 34, items: [{ x: 254, music: 'f4:h' }, { x: 283, text: '=' }, { box: [320, 428], top: 10, bottom: 54 }],
+    answer: { headY: 45, items: [{ x: 350, music: 'f4:q f4:q', spacing: 32 }] } },
+  { headY: 126, items: [{ x: 18, music: 'f4:w' }, { x: 40, text: '=' }, { box: [54, 229], top: 99, bottom: 145 }],
+    answer: { headY: 132, items: [{ x: 64, music: 'f4:8 f4:8 f4:8 f4:8', beam: true, spacing: 21 }, { x: 145, music: 'f4:8 f4:8 f4:8 f4:8', beam: true, spacing: 21 }] } },
+  { headY: 126, items: [{ x: 250, music: 'f4:h' }, { x: 282, text: '=' }, { box: [316, 424], top: 99, bottom: 143 }],
+    answer: { headY: 133, items: [{ x: 340, music: 'f4:q' }, { x: 381, music: 'f4:8 f4:8', beam: true, spacing: 24 }] } },
+  { headY: 220, items: [{ x: 3, music: 'f4:16 f4:16 f4:16 f4:16', beam: true, spacing: 23 }, { x: 90, text: '=' }, { box: [110, 193], top: 188, bottom: 233 }],
+    answer: { headY: 220, items: [{ x: 150, music: 'f4:q' }] } },
+  { headY: 220, items: [{ x: 212, music: 'f4:8 f4:8 f4:8 f4:8', beam: true, spacing: 22 }, { x: 307, music: 'f4:h' }, { x: 336, text: '=' }, { box: [361, 435], top: 187, bottom: 232 }],
+    answer: { headY: 212, items: [{ x: 398, music: 'f4:w' }] } },
+];
 
-function renderDurationWorksheet(overlay, answers = false) {
-  const red = '#d32f2f';
-  const cells = [
-    { x: 35, y: 45, symbol: 'whole', prompt: '1 whole = ____ quarters', answer: '4 quarter notes' },
-    { x: 485, y: 45, symbol: 'half', prompt: '1 half = ____ quarters', answer: '2 quarter notes' },
-    { x: 35, y: 210, symbol: 'whole', prompt: '1 whole = ____ eighths', answer: '8 eighth notes' },
-    { x: 485, y: 210, symbol: 'half', prompt: '1 half = 1 quarter + ____ eighths', answer: '2 eighth notes' },
-    { x: 35, y: 375, symbol: 'sixteenths', prompt: '4 sixteenths = 1 ____', answer: 'quarter note' },
-    { x: 485, y: 375, symbol: 'mixed', prompt: '4 eighths + 1 half = 1 ____', answer: 'whole note' },
-  ];
-  cells.forEach(({ x, y, symbol, prompt, answer }) => {
-    if (symbol === 'sixteenths') [x + 15, x + 55, x + 95, x + 135].forEach((sx) => drawSymbolNote(overlay, sx, y + 55, 'quarter'));
-    else if (symbol === 'mixed') [x + 5, x + 55, x + 105, x + 155].forEach((sx) => drawSymbolNote(overlay, sx, y + 55, 'quarter'));
-    else drawSymbolNote(overlay, x + 35, y + 55, symbol);
-    overlay.text('=', x + 100, y + 60, { 'font-size': 25, 'text-anchor': 'middle' });
-    box(overlay, x + 135, y, 220, 95);
-    if (answers) {
-      overlay.text(answer, x + 245, y + 58, { fill: red, 'font-size': 17, 'font-weight': '700', 'text-anchor': 'middle' });
-    }
-    overlay.text(prompt, x + 180, y + 135, { 'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle' });
+const durationText = [
+  [[1, 75, '1 whole ='], [124, 75, 'quarters'], [233, 75, '1 half ='], [368, 75, 'quarters']],
+  [[6, 166, '1 whole ='], [111, 166, 'eighths'], [216, 166, '1 half ='], [265, 166, '1 quarter +'], [369, 166, 'eighths']],
+  [[4, 250, '4 sixteenths ='], [108, 250, '1'], [217, 252, '4 eighths + 1 half ='], [357, 252, '1']],
+];
+const durationBlanks = [[89, 119, 77], [333, 363, 77], [76, 106, 168], [333, 363, 168], [119, 185, 253], [368, 440, 255]];
+const durationAnswers = [[104, 73, '4'], [348, 73, '2'], [91, 165, '8'], [348, 165, '2'], [152, 249, 'quarter'], [403, 251, 'whole']];
+
+function renderDurationWorksheet(VF, context, overlay, answers = false) {
+  durationRows.forEach(({ headY, items, answer }) => {
+    drawRhythmEquation(VF, context, overlay, items, { headY });
+    if (answers) answer.items.forEach((item) => drawRhythmEquation(VF, context, overlay, [{ ...item, color: red }], { headY: answer.headY }));
   });
+  durationText.flat().forEach(([x, y, text]) => overlay.text(text, x, y, { 'font-size': 12, 'font-weight': '700' }));
+  durationBlanks.forEach(([x1, x2, y]) => overlay.line(x1, y, x2, y, { stroke: '#666', 'stroke-width': 1 }));
+  if (answers) durationAnswers.forEach(([x, y, text]) => overlay.text(text, x, y, { fill: red, 'font-size': 12, 'font-weight': '700', 'text-anchor': 'middle' }));
 }
+
+const restWidths = [230, 84, 180, 200, 200, 100];
+const restNoteMeasures = ['f4:h f4:q f4:q', 'f4:w', 'f4:q f4:8 f4:8 f4:h', 'f4:16 f4:16 f4:8 f4:h f4:q', 'f4:16 f4:8 f4:16 f4:q f4:h', 'f4:w'];
 
 export const definitions = [
   {
@@ -40,36 +46,52 @@ export const definitions = [
     sources: ['1f026bcc116aef253d1c52649ca5cfcf53b691e2.png'],
     output: 'note-duration-practice.svg',
     alt: 'A worksheet with empty boxes and blanks for completing equivalent note-duration equations.',
-    width: 940,
-    height: 570,
-    render({ overlay }) { renderDurationWorksheet(overlay, false); },
+    width: 440,
+    height: 262,
+    render({ VF, context, overlay }) { renderDurationWorksheet(VF, context, overlay, false); },
   },
   {
     id: 'note-duration-practice-solutions',
     sources: ['e420035b374f956c2c7e871076450ff828a83e6f.png'],
     output: 'note-duration-practice-solutions.svg',
     alt: 'Completed note-duration equations showing equivalent quarter, eighth, half, and whole-note values.',
-    width: 940,
-    height: 570,
-    render({ overlay }) { renderDurationWorksheet(overlay, true); },
+    width: 440,
+    height: 262,
+    render({ VF, context, overlay }) { renderDurationWorksheet(VF, context, overlay, true); },
   },
   {
     id: 'tempo-changes-actual-duration',
     sources: ['1da6a0c9f0312bd0155dbc94725a1e8649cc66d5.png'],
     output: 'tempo-changes-actual-duration.svg',
-    alt: 'The same notes in slow three-four and fast two-two meter, showing that tempo affects actual duration.',
+    alt: 'Largo in three-four, where the quarter note gets one beat and beats are slow and long, and Allegro in two-two, where the half note gets one beat and beats are fast and short; a half note is twice a quarter note on both staves, but a half note in the fast piece is much shorter than one in the slow piece.',
     width: 900,
     height: 420,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 50, width: 540, time: '3/4', notes: [{ key: 'c/5', duration: 'h' }, { key: 'd/5', duration: 'q' }, { key: 'e/5', duration: 'h' }, { key: 'f/5', duration: 'q' }], formatWidth: 360 });
-      overlay.text('Largo', 100, 36, { fill: '#1769aa', 'font-size': 18, 'font-style': 'italic' });
-      overlay.text('Beats are slow and long', 650, 105, { fill: '#1769aa', 'font-size': 17 });
-      overlay.text('A quarter note gets one beat', 650, 145, { fill: '#c62828', 'font-size': 17 });
-      drawStave(VF, context, { x: 45, y: 245, width: 540, time: '2/2', notes: [{ key: 'c/5', duration: 'h' }, { key: 'd/5', duration: 'q' }, { key: 'e/5', duration: 'h' }, { key: 'f/5', duration: 'q' }], formatWidth: 360 });
-      overlay.text('Allegro', 100, 231, { fill: '#1769aa', 'font-size': 18, 'font-style': 'italic' });
-      overlay.text('Beats are fast and short', 650, 300, { fill: '#1769aa', 'font-size': 17 });
-      overlay.text('A half note gets one beat', 650, 340, { fill: '#c62828', 'font-size': 17 });
-      overlay.text('Relative note values stay the same, but their duration in seconds changes.', 450, 405, { 'font-size': 17, 'text-anchor': 'middle' });
+      const blue = '#1769aa';
+      const red = '#c62828';
+      drawMeasures(VF, context, {
+        x: 10, y: 27, widths: [305, 200], time: '3/4', spread: 0.7,
+        measures: [melody('f4:h a4:q'), [...melody('c5:h', { stemDirection: -1 }), ...melody('f5:q', { stemDirection: -1 })]],
+      });
+      overlay.text('Largo', 76, 42, { fill: blue, 'font-size': 16, 'font-style': 'italic', 'font-weight': '700' });
+      overlay.text('Beats are slow and long', 200, 18, { fill: blue, 'font-size': 15 });
+      arrowLine(overlay, 190, 16, 152, 34, { stroke: blue, head: 9 });
+      arrowLine(overlay, 172, 168, 118, 138, { stroke: red, head: 9 });
+      overlay.text('Quarter note gets one beat', 170, 182, { fill: red, 'font-size': 15 });
+      drawMeasures(VF, context, {
+        x: 10, y: 252, widths: [312, 211], time: '2/2', spread: 0.7,
+        measures: [
+          [...melody('c5:h b4:q', { stemDirection: -1 }), ...melody('a4:q', { stemDirection: 1 })],
+          [...melody('g4:h', { stemDirection: 1 }), ...melody('c5:q', { stemDirection: -1 }), ...melody('g4:q', { stemDirection: 1 })],
+        ],
+      });
+      overlay.text('Allegro', 66, 267, { fill: blue, 'font-size': 16, 'font-style': 'italic', 'font-weight': '700' });
+      overlay.text('Beats are fast and short', 203, 250, { fill: blue, 'font-size': 15 });
+      arrowLine(overlay, 192, 250, 154, 268, { stroke: blue, head: 9 });
+      arrowLine(overlay, 132, 402, 86, 360, { stroke: red, head: 9 });
+      overlay.text('Half notes get one beat', 135, 415, { fill: red, 'font-size': 15 });
+      ['On both staves,', 'a half note is twice as long', 'as a quarter note.', 'But', 'a half note on the second staff', 'will be a lot shorter than', 'a half note on the first staff.']
+        .forEach((line, index) => overlay.text(line, 572, 118 + index * 30, { 'font-size': 14 }));
     },
   },
   {
@@ -80,18 +102,21 @@ export const definitions = [
     width: 980,
     height: 630,
     render({ VF, context, overlay }) {
+      const bar = { bar: 'single' };
+      const up = (keys, duration = 'q') => ({ keys, duration, stemDirection: 1 });
+      const down = (keys, duration = 'q') => ({ keys, duration, stemDirection: -1 });
       const examples = [
-        { x: 35, y: 45, title: 'Single notes', notes: [{ key: 'c/4', stemDirection: 1 }, { key: 'e/4', stemDirection: 1 }, { key: 'g/4', stemDirection: 1 }, { key: 'b/4', stemDirection: -1 }, { key: 'd/5', stemDirection: -1 }] },
-        { x: 510, y: 45, title: 'Notes on a beam', notes: ['c/4', 'e/4', 'g/4', 'b/4', 'd/5'].map((key) => ({ key, duration: '8' })), beams: true },
-        { x: 35, y: 245, title: 'Notes in chords', notes: [['c/4', 'e/4'], ['d/4', 'f/4'], ['e/4', 'g/4']].map((keys) => ({ keys, duration: 'h' })) },
-        { x: 510, y: 245, title: 'Separate parts', notes: [{ keys: ['c/4', 'e/4'], duration: 'q', stemDirection: 1 }, { keys: ['b/3', 'd/4'], duration: 'q', stemDirection: -1 }, { key: 'g/4', duration: 'h', stemDirection: 1 }] },
+        { x: 35, y: 45, title: 'Single notes', key: 'F', time: 'C', notes: [up(['c/4']), bar, up(['f/4']), up(['a/4']), { keys: ['c/5'], duration: 'q', dots: 1, stemDirection: -1 }, down(['f/5'], '8')] },
+        { x: 510, y: 45, title: 'Notes on a beam', time: '2/4', notes: [...['c/4', 'f/4', 'g/4', 'a/4'].map((key) => up([key], '16')), ...['b/4', 'g/5'].map((key) => down([key], '8'))], beamGroups: [[0, 3], [4, 5]] },
+        { x: 35, y: 245, title: 'Notes in chords', key: 'G', time: 'C', notes: [up(['a/3', 'd/4', 'g/4'], 'h'), up(['d/4', 'b/4', 'd/5'], 'h'), bar, down(['g/4', 'b/4', 'g/5'], 'h'), down(['a/4', 'd/5', 'f/5'], 'h')] },
+        { x: 510, y: 245, title: 'Separate parts', key: 'F', time: '3/4', notes: [up(['f/4', 'a/4']), up(['e/4', 'g/4']), up(['d/4', 'f/4']), bar, down(['e/4']), down(['g/4']), down(['c/4'])] },
       ];
-      examples.forEach(({ x, y, title, notes, beams }) => {
+      examples.forEach(({ x, y, title, key, time, notes, beamGroups }) => {
         overlay.text(title, x + 210, y - 12, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' });
-        drawStave(VF, context, { x, y, width: 435, time: x === 35 ? '4/4' : undefined, notes, formatWidth: 290, beams });
+        drawStave(VF, context, { x, y, width: 435, key, time, notes, formatWidth: 290, beamGroups });
       });
       overlay.text('Multiple rhythms in one part', 490, 442, { 'font-size': 18, 'font-weight': '700', 'text-anchor': 'middle' });
-      drawStave(VF, context, { x: 140, y: 465, width: 700, time: '2/4', notes: [
+      drawStave(VF, context, { x: 140, y: 465, width: 700, key: 'Eb', time: '2/4', notes: [
         { keys: ['c/4', 'e/4', 'g/4'], duration: 'h' }, { rest: true, duration: '8' }, { key: 'b/4', duration: '16' }, { key: 'c/5', duration: '16' }, { rest: true, duration: 'q' },
       ], formatWidth: 500, beams: true });
     },
@@ -100,13 +125,18 @@ export const definitions = [
     id: 'rest-duration-practice',
     sources: ['516221c98846357d9645c78d9c218df3ad872ef8.png'],
     output: 'rest-duration-practice.svg',
-    alt: 'A two-staff exercise asking for rests matching the note durations on the upper staff.',
+    alt: 'A two-staff exercise in four-four time. The upper staff has six measures of F notes: half, quarter, quarter; whole; quarter, two eighths, half; two sixteenths and an eighth, half, quarter; sixteenth, eighth, sixteenth, quarter, half; whole. The lower staff has only the first measure filled, with a half rest and two quarter rests, and five blank measures to complete.',
     width: 1000,
     height: 330,
     render({ VF, context, overlay }) {
-      const durations = ['h', 'q', 'q', 'w', 'q', '8', '8', 'q', '16', '16', '8', 'h'];
-      drawStave(VF, context, { x: 40, y: 45, width: 920, time: '4/4', notes: durations.map((duration) => ({ key: 'b/4', duration })), formatWidth: 760, beams: true });
-      drawStave(VF, context, { x: 40, y: 205, width: 920, time: '4/4', notes: [{ rest: true, duration: 'h' }, { rest: true, duration: 'q' }, { rest: true, duration: 'q' }], formatWidth: 180 });
+      drawMeasures(VF, context, {
+        x: 20, y: 45, widths: restWidths, time: '4/4', spread: 0.8, beams: [[], [], [[1, 2]], [[0, 2]], [[0, 2]], []],
+        measures: restNoteMeasures.map((text) => melody(text)),
+      });
+      drawMeasures(VF, context, {
+        x: 20, y: 205, widths: restWidths, time: '4/4', spread: 0.8,
+        measures: [melody('r:h r:q r:q'), [], [], [], [], []],
+      });
       overlay.text('Write matching rests in the blank measures.', 500, 190, { 'font-size': 18, 'text-anchor': 'middle' });
     },
   },
@@ -114,13 +144,14 @@ export const definitions = [
     id: 'rest-duration-practice-solutions',
     sources: ['d7543f40076f23c7dd430a0b2d4c88e279a6d708.png'],
     output: 'rest-duration-practice-solutions.svg',
-    alt: 'Completed two-staff exercise pairing each written note duration with an equivalent rest.',
+    alt: 'One four-four staff of six measures of rests matching the note durations of the exercise: half rest and two quarter rests; whole rest; quarter rest and two eighth rests then half rest; two sixteenth rests, eighth rest, half rest, quarter rest; sixteenth rest, eighth rest, sixteenth rest, quarter rest, half rest; whole rest.',
     width: 1000,
-    height: 330,
+    height: 150,
     render({ VF, context }) {
-      const durations = ['h', 'q', 'q', 'w', 'q', '8', '8', 'q', '16', '16', '8', 'h'];
-      drawStave(VF, context, { x: 40, y: 45, width: 920, time: '4/4', notes: durations.map((duration) => ({ key: 'b/4', duration })), formatWidth: 760, beams: true });
-      drawStave(VF, context, { x: 40, y: 205, width: 920, time: '4/4', notes: durations.map((duration) => ({ rest: true, duration })), formatWidth: 760 });
+      drawMeasures(VF, context, {
+        x: 20, y: 40, widths: restWidths, time: '4/4', spread: 0.8,
+        measures: ['r:h r:q r:q', 'r:w', 'r:q r:8 r:8 r:h', 'r:16 r:16 r:8 r:h r:q', 'r:16 r:8 r:16 r:q r:h', 'r:w'].map((text) => melody(text)),
+      });
     },
   },
   {
@@ -129,14 +160,28 @@ export const definitions = [
     output: 'simultaneous-rhythms-with-rests.svg',
     alt: 'Two examples using rests to clarify simultaneous upper and lower rhythms on a single staff.',
     width: 920,
-    height: 450,
+    height: 380,
     render({ VF, context, overlay }) {
-      drawStave(VF, context, { x: 45, y: 45, width: 830, time: '6/8', notes: [
-        note(VF, { key: 'c/5', duration: 'q', dots: 1 }), { rest: true, duration: '8' }, { key: 'd/5', duration: '8' }, { key: 'e/5', duration: 'q' },
-      ], formatWidth: 610, beams: true });
-      drawStave(VF, context, { x: 45, y: 180, width: 830, clef: null, notes: ['c/4', 'e/4', 'g/4', 'c/4', 'e/4', 'g/4'].map((key) => ({ key, duration: '8', stemDirection: 1 })), formatWidth: 610, beams: true });
-      overlay.text('Upper and lower rhythms remain visually distinct.', 460, 325, { 'font-size': 18, 'text-anchor': 'middle' });
-      drawStave(VF, context, { x: 170, y: 335, width: 580, time: '2/4', notes: [
+      // Two voices share each measure: upper stems up, lower stems down.
+      const sixEight = [
+        { upper: [{ keys: ['e/5'], duration: 'q', dots: 1 }, { keys: ['c/5'], duration: '8' }, { rest: true, duration: '8' }, { keys: ['g/5'], duration: '8' }],
+          lower: ['c/4', 'e/4', 'g/4', 'c/4', 'e/4', 'g/4'] },
+        { upper: [{ rest: true, duration: 'q' }, { keys: ['e/5'], duration: '8' }, { keys: ['g/5'], duration: 'q', dots: 1 }],
+          lower: ['c/4', 'e/4', 'g/4', 'c/4', 'e/4', 'g/4'] },
+      ];
+      sixEight.forEach(({ upper, lower }, index) => {
+        const stave = new VF.Stave(45 + index * 400, 70, index ? 380 : 420);
+        if (index === 0) stave.addClef('treble').addTimeSignature('6/8');
+        stave.setContext(context).draw();
+        const upperNotes = upper.map((item) => note(VF, { ...item, stemDirection: 1 }));
+        const lowerNotes = lower.map((key) => note(VF, { key, duration: '8', stemDirection: -1 }));
+        const voices = [upperNotes, lowerNotes].map((notes) => new VF.Voice({ num_beats: 6, beat_value: 8 }).setStrict(false).addTickables(notes));
+        new VF.Formatter().joinVoices(voices).format(voices, index ? 280 : 300);
+        const beams = [[1, 2], [4, 5]].map(([from, to]) => new VF.Beam(lowerNotes.slice(from, to + 1)));
+        voices.forEach((voice) => voice.setStave(stave).draw(context, stave));
+        beams.forEach((beam) => beam.setContext(context).draw());
+      });
+      drawStave(VF, context, { x: 170, y: 260, width: 580, time: '2/4', notes: [
         { keys: ['c/4', 'e/4', 'g/4'], duration: 'h' }, { rest: true, duration: '8' }, { key: 'c/5', duration: '16' }, { key: 'd/5', duration: '16' }, { rest: true, duration: 'q' },
       ], formatWidth: 390, beams: true });
     },
@@ -169,13 +214,15 @@ export const definitions = [
     height: 280,
     render({ VF, context, overlay }) {
       const groups = [
-        Array.from({ length: 3 }, () => ({ key: 'c/5', duration: '8' })),
-        Array.from({ length: 6 }, () => ({ key: 'c/5', duration: '16' })),
-        [{ key: 'c/5', duration: 'q' }, { key: 'c/5', duration: '8' }],
-        [note(VF, { key: 'c/5', duration: 'q', dots: 1 })],
-        [{ key: 'c/5', duration: '8' }, { key: 'c/5', duration: '16' }, { key: 'c/5', duration: '16' }],
+        Array.from({ length: 3 }, () => ({ key: 'g/4', duration: '8' })),
+        Array.from({ length: 6 }, () => ({ key: 'g/4', duration: '16' })),
+        [{ key: 'g/4', duration: 'q' }, { key: 'g/4', duration: '8' }],
+        [note(VF, { key: 'g/4', duration: 'q', dots: 1 })],
+        [{ key: 'g/4', duration: '8' }, { key: 'g/4', duration: '16' }, { key: 'g/4', duration: '16' }, { key: 'g/4', duration: '8' }],
       ];
-      groups.forEach((notes, index) => drawStave(VF, context, { x: 25 + index * 200, y: 55, width: 190, clef: index === 0 ? 'treble' : null, time: index === 0 ? '3/8' : undefined, notes, formatWidth: 100, beams: true }));
+      const beamGroups = [[[0, 2]], [[0, 5]], [], [], [[0, 3]]];
+      groups.forEach((notes, index) => drawStave(VF, context, { x: 25 + index * 200, y: 55, width: 190, clef: index === 0 ? 'treble' : null, time: index === 0 ? '3/8' : undefined, notes, formatWidth: 100, beamGroups: beamGroups[index] }));
+      [220, 420, 620, 820].forEach((x) => overlay.text('=', x, 224, { 'font-size': 18, 'text-anchor': 'middle' }));
       labelUnder(overlay, ['3 eighths', '6 sixteenths', '1 quarter\n+ 1 eighth', 'dotted quarter', '2 eighths\n+ 2 sixteenths'], 120, 200, 220, { 'data-line-height': 20 });
     },
   },
@@ -183,16 +230,19 @@ export const definitions = [
     id: 'time-signature-practice-solutions',
     sources: ['08d3f79041cd4535ab484cde32f313555b39adcd.png'],
     output: 'time-signature-practice-solutions.svg',
-    alt: 'Example completed measures in two-four, three-eight, and six-four time signatures.',
+    alt: 'Example completed measures of A notes in two-four (five measures), three-eight (five measures), and six-four (four measures) time signatures.',
     width: 1020,
     height: 560,
     render({ VF, context, overlay }) {
       const rows = [
-        { y: 35, time: '2/4', notes: [{ key: 'c/5', duration: 'q' }, { key: 'd/5', duration: 'q' }, note(VF, { key: 'e/5', duration: 'q', dots: 1 }), { key: 'f/5', duration: '8' }, ...Array.from({ length: 4 }, () => ({ key: 'g/5', duration: '8' }))] },
-        { y: 205, time: '3/8', notes: [note(VF, { key: 'c/5', duration: 'q', dots: 1 }), ...Array.from({ length: 3 }, () => ({ key: 'd/5', duration: '8' })), { key: 'e/5', duration: 'q' }, { key: 'f/5', duration: '8' }] },
-        { y: 375, time: '6/4', notes: [{ key: 'c/5', duration: 'w' }, { key: 'd/5', duration: 'h' }, note(VF, { key: 'e/5', duration: 'h', dots: 1 }), ...Array.from({ length: 3 }, () => ({ key: 'f/5', duration: 'q' }))] },
+        { y: 35, time: '2/4', widths: [273, 172, 190, 256, 96], beams: [[], [], [[0, 1]], [[0, 1], [2, 4]], []],
+          measures: ['a4:q a4:q', 'a4:q. a4:8', 'a4:8 a4:8 a4:q', 'a4:8 a4:8 a4:16 a4:16 a4:8', 'a4:h'] },
+        { y: 205, time: '3/8', widths: [209, 166, 182, 215, 203], beams: [[], [[0, 2]], [], [[0, 3]], []],
+          measures: ['a4:q.', 'a4:8 a4:8 a4:8', 'a4:q a4:8', 'a4:16 a4:16 a4:8. a4:16', 'a4:8 a4:q'] },
+        { y: 375, time: '6/4', widths: [275, 162, 269, 269], beams: [[], [], [], [[2, 3]]],
+          measures: ['a4:w a4:h', 'a4:h. a4:h.', 'a4:q a4:q a4:q a4:q a4:h', 'a4:h a4:q a4:8 a4:8 a4:h'] },
       ];
-      rows.forEach(({ y, time, notes }) => drawStave(VF, context, { x: 45, y, width: 930, time, notes, formatWidth: 740, beams: true }));
+      rows.forEach(({ y, time, widths, beams, measures }) => drawMeasures(VF, context, { x: 20, y, widths, time, spread: 0.8, beams, measures: measures.map((text) => melody(text)) }));
       overlay.text('These are examples; many other correct combinations are possible.', 510, 548, { 'font-size': 18, 'text-anchor': 'middle' });
     },
   },

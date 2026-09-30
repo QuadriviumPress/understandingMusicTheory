@@ -14,11 +14,11 @@ export const definitions = [
     id: 'tempo-and-meter-examples',
     sources: ['5a8209d773fa3b65be50ec156c652a8d8389e5c1.png'],
     output: 'tempo-and-meter-examples.svg',
-    alt: 'Examples showing how tempo markings combine with four-four, cut, six-eight, and six-sixteen time.',
+    alt: 'Examples showing how tempo markings combine with four-four, cut, and six-eight time (quarter note = 88, half note = 120, dotted quarter = 80, and eighth note = 148).',
     width: 900,
     height: 470,
     render({ VF, context, overlay }) {
-      const rows = [['4/4', '♩ = 88', 'Four-four time: 88 quarter-note beats per minute'], ['C|', '𝅗𝅥 = 120', 'Cut time: 120 half-note beats per minute'], ['6/8', '♩. = 80', 'Six-eight time: about 80 dotted-quarter beats per minute'], ['6/16', '♪. = 148', 'Six-sixteen time: about 148 dotted-eighth beats per minute']];
+      const rows = [['4/4', '♩ = 88', 'Four-four time: 88 quarter-note beats per minute'], ['C|', '𝅗𝅥 = 120', 'Cut time: 120 half-note beats per minute'], ['6/8', '♩. = 80', 'Six-eight time: about 80 dotted-quarter beats per minute'], ['6/8', '♪ = 148', 'Six-eight time: 148 eighth notes per minute']];
       rows.forEach(([time, tempo, explanation], index) => {
         const y = 35 + index * 105;
         const stave = new VF.Stave(45, y, 210).addClef('treble').addTimeSignature(time);
@@ -32,16 +32,30 @@ export const definitions = [
     id: 'repeat-barlines',
     sources: ['b4c37691fafd379d87d5be52dc7271c4a6364cba.png'],
     output: 'repeat-barlines.svg',
-    alt: 'Repeat barlines showing a return to the beginning and a repeated section enclosed by repeat signs.',
+    alt: 'Two staves in cut time. The first has four measures (C, two A half notes, G, C) ending in a repeat sign that returns to the beginning. The second has two measures, then a repeat-begin sign, two measures (G and A half notes; B and G half notes) and a repeat-end sign, with a brace marking the repeated measures.',
     width: 900,
     height: 330,
     render({ VF, context, overlay }) {
-      const first = new VF.Stave(50, 55, 800).addClef('treble').addTimeSignature('C');
+      const first = new VF.Stave(50, 55, 800).addClef('treble').addTimeSignature('C|');
       first.setEndBarType(VF.Barline.type.REPEAT_END).setContext(context).draw();
-      const second = new VF.Stave(50, 185, 800).addClef('treble').addTimeSignature('C');
-      second.setBegBarType(VF.Barline.type.REPEAT_BEGIN).setEndBarType(VF.Barline.type.REPEAT_END).setContext(context).draw();
-      overlay.text('Return to the beginning and repeat once', 450, 160, { 'font-size': 18, 'text-anchor': 'middle' });
-      overlay.text('Repeat only the music enclosed by the repeat barlines', 450, 300, { 'font-size': 18, 'text-anchor': 'middle' });
+      const second = new VF.Stave(50, 185, 800).addClef('treble').addTimeSignature('C|');
+      second.setEndBarType(VF.Barline.type.REPEAT_END).setContext(context).draw();
+      const n = (key, duration, stem) => new VF.StaveNote({ keys: [key], duration, stemDirection: stem, autoStem: false });
+      const bar = (type = VF.Barline.type.SINGLE) => new VF.BarNote(type);
+      const drawRow = (stave, items) => {
+        const voice = new VF.Voice({ num_beats: 16, beat_value: 4 }).setStrict(false).addTickables(items);
+        new VF.Formatter().joinVoices([voice]).format([voice], 640);
+        voice.setStave(stave).draw(context, stave);
+      };
+      drawRow(first, [n('c/5', 'w', 1), bar(), n('a/4', 'h', 1), n('a/4', 'h', 1), bar(), n('g/4', 'w', 1), bar(), n('c/5', 'w', 1)]);
+      const repeatStart = bar(VF.Barline.type.REPEAT_BEGIN);
+      drawRow(second, [n('c/5', 'w', 1), bar(), n('d/5', 'h', -1), n('c/5', 'h', -1), repeatStart,
+        n('g/4', 'h', 1), n('a/4', 'h', 1), bar(), n('b/4', 'h', -1), n('g/4', 'h', 1)]);
+      const braceX = repeatStart.getAbsoluteX() + 6;
+      const mid = (braceX + 850) / 2;
+      overlay.path(`M ${braceX} 262 Q ${braceX} 274 ${braceX + 14} 274 H ${mid - 10} Q ${mid} 274 ${mid} 282 Q ${mid} 274 ${mid + 10} 274 H ${846 - 14} Q 846 274 846 262`, { fill: 'none', stroke: '#111', 'stroke-width': 2 });
+      overlay.text('Go all the way back to the beginning and repeat once.', 450, 160, { 'font-size': 18, 'text-anchor': 'middle' });
+      overlay.text('Repeat (once) only the measures in between the repeat dots.', 450, 305, { 'font-size': 18, 'text-anchor': 'middle' });
     },
   },
   {
@@ -104,14 +118,14 @@ export const definitions = [
     id: 'tie-example',
     sources: ['22b5ae512ec83d6deb1ceb4ddee6e040e09b7d52.png'],
     output: 'tie-example.svg',
-    alt: 'Two notes of the same pitch joined by a tie across a barline.',
+    alt: 'Two half notes, G and E above the staff and in the top space, joined by a tie before the barline.',
     width: 720,
     height: 230,
     render({ VF, context, overlay }) {
       const stave = new VF.Stave(55, 65, 610).addClef('treble').addTimeSignature('C');
       stave.setContext(context).draw();
-      const notes = [new VF.StaveNote({ keys: ['d/5'], duration: 'w' }), new VF.StaveNote({ keys: ['d/5'], duration: 'w' })];
-      const voice = new VF.Voice({ num_beats: 8, beat_value: 4 }).setStrict(false).addTickables(notes);
+      const notes = [new VF.StaveNote({ keys: ['g/5'], duration: 'h' }).setStemDirection(-1), new VF.StaveNote({ keys: ['e/5'], duration: 'h' }).setStemDirection(-1)];
+      const voice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false).addTickables(notes);
       new VF.Formatter().joinVoices([voice]).format([voice], 430);
       voice.setStave(stave).draw(context, stave);
       new VF.StaveTie({ firstNote: notes[0], lastNote: notes[1], firstIndexes: [0], lastIndexes: [0] }).setContext(context).draw();

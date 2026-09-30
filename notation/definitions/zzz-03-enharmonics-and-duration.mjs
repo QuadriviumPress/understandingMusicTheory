@@ -84,18 +84,18 @@ export const definitions = [
     height: 300,
     render({ VF, context, overlay }) {
       drawStave(VF, context, { x: 250, y: 70, width: 180, clef: null, notes: [note(VF, { key: 'b/4', duration: 'h', dots: 1 })], formatWidth: 65 });
-      drawStave(VF, context, { x: 500, y: 70, width: 180, clef: null, notes: [note(VF, { key: 'b/4', duration: '8' })], formatWidth: 65 });
+      drawStave(VF, context, { x: 500, y: 70, width: 180, clef: null, notes: [note(VF, { key: 'b/4', duration: '8', stemDirection: 1 })], formatWidth: 65 });
       overlay.text('head\n(not filled in)', 40, 145, { 'font-size': 17, 'data-line-height': 22 });
       overlay.line(175, 130, 292, 123, { stroke: '#111', 'stroke-width': 1.7 });
-      overlay.text('dot', 350, 40, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
-      overlay.line(350, 48, 350, 96, { stroke: '#1769aa', 'stroke-width': 1.7 });
+      overlay.text('dot', 294, 40, { fill: '#1769aa', 'font-size': 18, 'text-anchor': 'middle' });
+      overlay.line(294, 48, 294, 112, { stroke: '#1769aa', 'stroke-width': 1.7 });
       overlay.text('stem', 465, 225, { fill: '#d32f2f', 'font-size': 18, 'text-anchor': 'middle' });
-      overlay.line(415, 205, 345, 145, { stroke: '#d32f2f', 'stroke-width': 1.7 });
-      overlay.line(515, 205, 555, 145, { stroke: '#d32f2f', 'stroke-width': 1.7 });
+      overlay.line(415, 205, 283, 165, { stroke: '#d32f2f', 'stroke-width': 1.7 });
+      overlay.line(515, 205, 541, 112, { stroke: '#d32f2f', 'stroke-width': 1.7 });
       overlay.text('flag', 715, 82, { 'font-size': 17 });
-      overlay.line(705, 88, 625, 115, { stroke: '#111', 'stroke-width': 1.7 });
+      overlay.line(705, 88, 553, 100, { stroke: '#111', 'stroke-width': 1.7 });
       overlay.text('head (filled in)', 650, 240, { 'font-size': 17 });
-      overlay.line(640, 220, 590, 150, { stroke: '#111', 'stroke-width': 1.7 });
+      overlay.line(640, 220, 545, 138, { stroke: '#111', 'stroke-width': 1.7 });
     },
   },
   {
@@ -115,13 +115,13 @@ export const definitions = [
       overlay.text('Headless notes have\ndefinite rhythm but not\ndefinite pitch.', 10, 190, { 'font-size': 17, 'data-line-height': 24, fill: '#222' });
       drawStave(VF, context, {
         x: 305, y: 22, width: 180, beginBar: 'none', endBar: 'none', formatWidth: 60,
-        notes: Array.from({ length: 4 }, () => ({ keys: ['b/4/s'], duration: '16', stemDirection: 1 })), beamGroups: [[0, 3]],
+        notes: Array.from({ length: 4 }, () => ({ keys: ['b/4/s'], duration: '8', stemDirection: 1 })), beamGroups: [[0, 3]],
       });
       overlay.text('Gm', 396, 13, { 'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle' });
       overlay.text('=', 521, 88, { 'font-size': 22, 'font-weight': '700', 'text-anchor': 'middle' });
       drawStave(VF, context, {
         x: 555, y: 22, width: 190, beginBar: 'none', endBar: 'none', formatWidth: 80, beamGroups: [[0, 3]],
-        notes: melody('(g3+d4+g4+bb4+d5+g5):16 (g3+d4+g4+bb4+d5+g5):16 (g3+d4+g4+bb4+d5+g5):16 (g3+d4+g4+bb4+d5+g5):16', { stemDirection: 1 }),
+        notes: melody('(g3+d4+g4+bb4+d5+g5):8 (g3+d4+g4+bb4+d5+g5):8 (g3+d4+g4+bb4+d5+g5):8 (g3+d4+g4+bb4+d5+g5):8', { stemDirection: 1 }),
       });
       overlay.text('Notes with slashes instead of heads\nare a quick way to write an entire chord\nand may be easier for some instrumentalists\n(such as guitarists) to read.', 265, 185, { 'font-size': 17, 'data-line-height': 24, fill: '#222' });
     },
@@ -178,7 +178,7 @@ export const definitions = [
         left.forEach(([value, x]) => drawSymbolNote(overlay, x, y, value));
         overlay.text('=', 365, y + 7, { 'font-size': 27, 'text-anchor': 'middle' });
         right.forEach(([value, x]) => drawSymbolNote(overlay, x, y, value));
-        overlay.text(text, 610, y + 7, { 'font-size': 16, 'text-anchor': 'middle' });
+        overlay.text(text, 365, y + 52, { 'font-size': 16, 'text-anchor': 'middle' });
       });
     },
   },

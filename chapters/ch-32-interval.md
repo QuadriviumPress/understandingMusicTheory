@@ -70,7 +70,7 @@ Listen to the compound intervals in the referenced item: [ninth](../images/cnx/5
 
 So far, the actual distance, in half-steps, between the two notes has not mattered. But a third made up of three half-steps sounds different from a third made up of four half-steps. And a fifth made up of seven half-steps sounds very different from one of only six half-steps. So in the second step of identifying an interval, [clef](ch-02-clef.md), [key signature](ch-04-key-signature.md), and [accidentals](ch-03-pitch-sharp-flat-and-natural-notes.md) become important.
 
-![A–C and A–C-sharp are both thirds; A–E and A–E-flat are both fifths.](../images/notation/thirds-and-fifths-with-accidentals.svg)
+![Melodic intervals above A: A–C (three half steps) and A–C-sharp (four half steps) are both thirds; A–E (seven half steps) and A–E-flat (six half steps) are both fifths.](../images/notation/thirds-and-fifths-with-accidentals.svg)
 
 A to C natural and A to C sharp are both thirds, but A to C sharp is a larger interval, with a different sound. The difference between the intervals A to E natural and A to E flat is even more noticeable.
 

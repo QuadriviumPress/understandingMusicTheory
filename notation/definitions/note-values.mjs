@@ -1,3 +1,5 @@
+import { noteX } from '../figure-helpers.mjs';
+
 export const definition = {
   id: 'note-values',
   sources: ['58f7babd6a79d85b58a149a716fd1b943e004d1d.png'],
@@ -13,6 +15,6 @@ export const definition = {
     const voice = new VF.Voice({ num_beats: 8, beat_value: 4 }).setStrict(false).addTickables(notes);
     new VF.Formatter().joinVoices([voice]).format([voice], 700);
     voice.setStave(stave).draw(context, stave);
-    entries.forEach(([, label], index) => overlay.text(`${label} note`, 175 + index * 124, 215, { 'font-size': 16, 'text-anchor': 'middle' }));
+    entries.forEach(([, label], index) => overlay.text(`${label}\nnote`, noteX(notes[index]) + (index === 5 ? 18 : index === 4 ? -6 : 0), 205, { 'font-size': 14, 'text-anchor': 'middle', 'data-line-height': 18 }));
   },
 };

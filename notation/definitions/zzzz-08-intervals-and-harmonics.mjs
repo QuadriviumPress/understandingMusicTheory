@@ -131,7 +131,7 @@ export const definitions = [
         overlay.text('Count:', steps[0][0] - (steps.length > 3 ? 12 : 42), bottom + 58, { 'font-size': 13, 'text-anchor': 'end' });
       };
       example({ y: -13, clef: 'treble', low: [127, 4], high: [200, 6], steps: [[140, 4], [167, 5], [193, 6]] });
-      example({ y: 123, clef: 'bass', low: [93, -1], high: [260, 4], steps: [[107, -1], [139, 0], [167, 1], [195, 2], [223, 3], [252, 4]] });
+      example({ y: 123, clef: 'bass', low: [93, 1], high: [260, 6], steps: [[107, 1], [139, 2], [167, 3], [195, 4], [223, 5], [252, 6]] });
     },
   },
   {
@@ -139,13 +139,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['7e50de433d0a7c1b59dacfe13036ded4a3f0adf8.png'],
     output: 'simple-intervals-prime-through-octave.svg',
-    alt: 'Eight written intervals above C, labelled prime, second, third, fourth, fifth, sixth, seventh, and octave.',
-    width: 1120,
-    height: 235,
+    alt: 'Eight written melodic intervals above C (C followed by the upper note), labelled prime, second, third, fourth, fifth, sixth, seventh, and octave.',
+    width: 960,
+    height: 150,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay,
-        [['c/4', 'c/4'], ['c/4', 'd/4'], ['c/4', 'e/4'], ['c/4', 'f/4'], ['c/4', 'g/4'], ['c/4', 'a/4'], ['c/4', 'b/4'], ['c/4', 'c/5']],
-        { width: 1120, labels: ['Prime', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Octave'], labelY: 195 });
+      drawIntervalRows(VF, context, overlay, [{
+        measures: [['c/4', 'c/4'], ['c/4', 'd/4'], ['c/4', 'e/4'], ['c/4', 'f/4'], ['c/4', 'g/4'], ['c/4', 'a/4'], ['c/4', 'b/4'], ['c/4', 'c/5']],
+        labels: ['Prime', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Octave'],
+      }], { widths: [170, 113, 113, 113, 113, 113, 113, 113], labelOffset: 115, labelSize: 15, y: 0 });
     },
   },
   {
@@ -207,11 +208,14 @@ export const definitions = [
     status: 'vexflow-overlay',
     sources: ['02df34c31ca1f7c64cc2059d3a8fcfc91afed439.png'],
     output: 'thirds-and-fifths-with-accidentals.svg',
-    alt: 'A–C and A–C-sharp are both thirds; A–E and A–E-flat are both fifths but differ in half-step size.',
-    width: 900,
-    height: 245,
+    alt: 'Melodic intervals above A: A up to C (three half steps) and A up to C-sharp (four half steps) are both thirds; A up to E (seven half steps) and A up to E-flat (six half steps) are both fifths.',
+    width: 520,
+    height: 235,
     render({ VF, context, overlay }) {
-      pairRow(VF, context, overlay, [['a/4', 'c/5'], ['a/4', 'c#/5', [null, '#']], ['a/4', 'e/5'], ['a/4', 'eb/5', [null, 'b']]], { width: 900, labels: ['A to C: third', 'A to C♯: third', 'A to E: fifth', 'A to E♭: fifth'], labelY: 200 });
+      drawIntervalRows(VF, context, overlay, [
+        { measures: [['a/4', 'c/5'], ['a/4', ['c/5', '#']]], labels: ['Three Half Steps = A Third', 'Four Half Steps = A different Third'] },
+        { measures: [['a/4', 'e/5'], ['a/4', ['e/5', 'b']]], labels: ['Seven Half Steps = A Fifth', 'Six Half Steps = A different Fifth'] },
+      ], { rowHeight: 120, labelOffset: 100, labelSize: 13, widths: [270, 250], y: 0 });
     },
   },
   {
@@ -363,7 +367,7 @@ export const definitions = [
       });
       [52, 83, 121, 171].forEach((x, index) => number(index + 1, x - 12, 72));
       const upper = ['e4', 'g4', 'bb4', 'c5', 'd5', 'e5', 'f#5', 'g5', 'a5', 'bb5', 'bn5', 'c6'];
-      const xs = [200, 277, 321, 367, 412, 461, 515, 558, 598, 643, 697, 744];
+      const xs = [233, 277, 321, 367, 412, 461, 515, 558, 598, 643, 697, 744];
       placeNotes(VF, context, { x: 183, y: -7, width: 577, beginBar: 'none', items: upper.map((pitch, index) => ({ x: xs[index], music: `${pitch}:w` })) });
       [233, 277, 319, 364, 412, 460, 514, 560, 600, 646, 696, 744].forEach((x, index) => number(index + 5, x, 113));
     },
@@ -434,32 +438,53 @@ export const definitions = [
     status: 'svg-overlay',
     sources: ['48fcee2683006bd15bb81c5f8806c034e40f7993.png'],
     output: 'string-harmonics-nodes.svg',
-    alt: 'Standing-wave diagrams show an open string vibrating in several modes and a lightly touched string vibrating only in modes that have a node at the touch point.',
-    width: 1080,
-    height: 510,
+    alt: 'Left: an open string vibrating in its first six standing-wave modes at the same time, with nodes marked. Below: a string touched lightly at its midpoint vibrates only in modes 2, 4, and 6, which have a node there, and sounds an octave higher.',
+    width: 1008,
+    height: 574,
     render({ overlay }) {
-      const wave = (x, y, length, lobes, color, dashed = false) => {
-        let d = `M ${x} ${y}`;
-        const step = length / lobes;
-        for (let i = 0; i < lobes; i += 1) {
-          const direction = i % 2 ? -1 : 1;
-          d += ` C ${x + step * (i + 0.25)} ${y - 45 * direction}, ${x + step * (i + 0.75)} ${y - 45 * direction}, ${x + step * (i + 1)} ${y}`;
+      const k = 2;
+      const t = (value, x, y, attributes = {}) => overlay.text(value, x * k, y * k, { 'font-size': 11 * k, 'data-line-height': 14.5 * k, ...attributes });
+      // Vertical standing wave with `lobes` half-waves between y1 and y2, drawn at x, bulging by sign * amp.
+      const vwave = (x, y1, y2, lobes, sign, color, dashed = false, amp = 9) => {
+        let d = '';
+        for (let i = 0; i <= 80; i += 1) {
+          const u = i / 80;
+          const px = (x + sign * amp * Math.sin(lobes * Math.PI * u)) * k;
+          const py = (y1 + (y2 - y1) * u) * k;
+          d += `${i ? ' L' : 'M'} ${px.toFixed(1)} ${py.toFixed(1)}`;
         }
-        overlay.path(d, { fill: 'none', stroke: color, 'stroke-width': 2.5, ...(dashed ? { 'stroke-dasharray': '7 6' } : {}) });
+        overlay.path(d, { fill: 'none', stroke: color, 'stroke-width': 1.6, ...(dashed ? { 'stroke-dasharray': '9 7' } : {}) });
       };
-      title(overlay, 'Open-string standing-wave modes', 300, 32);
-      overlay.line(55, 62, 545, 62, { stroke: ink, 'stroke-width': 2 });
-      [1, 2, 3, 4, 5].forEach((lobes, i) => wave(55, 95 + i * 62, 490, lobes, i % 2 ? blue : red));
-      overlay.text('Nodes are fixed points where the string does not move.', 585, 150, { 'font-size': 14, 'data-line-height': 20 });
-      title(overlay, 'Light touch at the marked point', 795, 32);
-      overlay.line(615, 62, 1030, 62, { stroke: ink, 'stroke-width': 2 });
-      overlay.line(823, 50, 823, 430, { stroke: '#666', 'stroke-width': 2, 'stroke-dasharray': '6 5' });
-      overlay.circle(823, 62, 6, { fill: ink });
-      wave(615, 125, 415, 2, red);
-      wave(615, 220, 415, 4, blue);
-      wave(615, 315, 415, 3, '#aaa', true);
-      overlay.path('M 978 285 L 1032 340 M 1032 285 L 978 340', { stroke: red, 'stroke-width': 4 });
-      overlay.text('Only modes with a node at the touch point continue to vibrate.\nIncompatible modes are silenced.', 820, 455, { 'font-size': 14, 'text-anchor': 'middle', 'data-line-height': 20 });
+      const hline = (x1, x2, y) => overlay.line(x1 * k, y * k, x2 * k, y * k, { stroke: '#555', 'stroke-width': 1.5 });
+      t('Open strings:', 0, 44, { 'font-weight': '700' });
+      t('the string vibrates\nat all its harmonics\nat the same time.', 0, 58);
+      hline(118, 330, 2);
+      hline(118, 330, 135);
+      [137, 173, 205, 237, 270, 312].forEach((x, i) => {
+        vwave(x, 2, 135, i + 1, -1, ink, false, i ? 9 : 10);
+        vwave(x, 2, 135, i + 1, 1, red, false, i ? 9 : 10);
+      });
+      t('Nodes', 347, 40);
+      [[335, 30, 318, 23], [335, 43, 318, 45]].forEach(([x1, y1, x2, y2]) => {
+        arrowLine(overlay, x1 * k, y1 * k, x2 * k, y2 * k, { head: 8, 'stroke-width': 1.2 });
+      });
+      t('The open string can vibrate\nat all these frequencies\nat the same time.', 349, 72);
+      t('Harmonics', 0, 175, { 'font-weight': '700' });
+      t('When a string is touched\nlightly at a certain spot,\nonly the harmonics\nthat have a node\nexactly at that spot\ncan still vibrate.', 0, 188);
+      hline(118, 330, 150);
+      hline(118, 330, 285);
+      [[173, 1], [237, 2], [312, 3]].forEach(([x, half]) => {
+        vwave(x, 150, 218, half, -1, ink, true, 8);
+        vwave(x, 150, 218, half, 1, red, true, 8);
+        vwave(x, 218, 285, half, -1, ink, false, 8);
+        vwave(x, 218, 285, half, 1, red, false, 8);
+        overlay.circle(x * k, 218 * k, 3 * k, { fill: blue });
+      });
+      // Crossings (nodes) in the silenced upper halves.
+      [[237, 184], [312, 172], [312, 195]].forEach(([x, y]) => {
+        overlay.path(`M ${(x - 5) * k} ${(y - 5) * k} L ${(x + 5) * k} ${(y + 5) * k} M ${(x + 5) * k} ${(y - 5) * k} L ${(x - 5) * k} ${(y + 5) * k}`, { stroke: ink, 'stroke-width': 1.2 });
+      });
+      t('A string that is touched lightly\nexactly at its midpoint\ncan only vibrate at the\nfrequencies that have\na node there. So it will\nhave a "thinner" sound than\nthe open string. It will also\nsound one octave higher\nthan the open string.', 352, 168);
     },
   },
 ];

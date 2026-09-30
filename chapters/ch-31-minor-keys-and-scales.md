@@ -18,7 +18,7 @@ Each [major key](ch-30-major-keys-and-scales.md) uses a different set of [notes]
 
 Minor scales sound different from major scales because they are based on a different pattern of [intervals](ch-32-interval.md). Just as it did in major scales, starting the minor scale pattern on a different note will give you a different [key signature](ch-04-key-signature.md), a different set of sharps or flats. The scale that is created by playing all the notes in a minor key signature is a *natural minor scale*. To create a natural minor scale, start on the [tonic note](ch-30-major-keys-and-scales.md) and go up the scale using the interval pattern: **whole step, half step, whole step, whole step, half step, whole step, whole step**.
 
-![C minor, G minor, and B minor scales illustrating the whole-half-whole-whole-half-whole-whole pattern.](../images/notation/natural-minor-scale-step-pattern-examples.svg)
+![C minor, D minor, and B minor scales illustrating the whole-half-whole-whole-half-whole-whole pattern.](../images/notation/natural-minor-scale-step-pattern-examples.svg)
 
 [Listen](../images/cnx/6faeb0239bfa900fbc32fc2eb77c0783bc9f26b7.midi) to these minor scales.
 

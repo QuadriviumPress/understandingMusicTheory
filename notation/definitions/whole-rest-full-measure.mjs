@@ -2,7 +2,7 @@ export const definition = {
   id: 'whole-rest-full-measure',
   sources: ['2749a1f9ce0ab7e901f61b6858a33354bba8033d.png'],
   output: 'whole-rest-full-measure.svg',
-  alt: 'Whole rests filling complete measures in both six-eight and two-four time.',
+  alt: 'A whole rest fills a complete measure in six-eight time; in two-four time, a measure of two quarter notes (G and C) is followed by a measure containing a whole rest.',
   width: 820,
   height: 330,
   render({ VF, context, overlay }) {
@@ -11,9 +11,12 @@ export const definition = {
       const second = new VF.Stave(400, y, 350);
       first.setContext(context).draw();
       second.setContext(context).draw();
-      [first, second].forEach((stave) => {
+      [first, second].forEach((stave, index) => {
+        const ticks = time === '2/4' && index === 0
+          ? [new VF.StaveNote({ keys: ['g/4'], duration: 'q' }).setStemDirection(1), new VF.StaveNote({ keys: ['c/5'], duration: 'q' }).setStemDirection(1)]
+          : [new VF.StaveNote({ keys: ['b/4'], duration: 'wr' })];
         const voice = new VF.Voice({ num_beats: 4, beat_value: 4 }).setStrict(false)
-          .addTickables([new VF.StaveNote({ keys: ['b/4'], duration: 'wr' })]);
+          .addTickables(ticks);
         new VF.Formatter().joinVoices([voice]).format([voice], 180);
         voice.setStave(stave).draw(context, stave);
       });

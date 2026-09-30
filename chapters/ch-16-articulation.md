@@ -50,7 +50,7 @@ A slur marking indicates no articulation - no break in the sound - between notes
 
 A *portamento* is a smooth glide between the two notes, including all the [pitches](ch-03-pitch-sharp-flat-and-natural-notes.md) in between. For some instruments, like [violin](https://cnx.org/content/m13437) and [trombone](https://cnx.org/content/m12602), this includes even the pitches in between the written notes. For other instruments, such as [guitar](https://cnx.org/content/m12745), it means sliding through all of the possible notes between the two written pitches.
 
-![Two notes of the same pitch joined by a tie across a barline.](../images/notation/tie-example.svg)
+![Two half notes, G above the staff and E in the top space, joined by a tie before the barline.](../images/notation/tie-example.svg)
 
 Although unusual in traditional [common notation](ch-01-the-staff.md), a type of portamento that includes only one written pitch can be found in some styles of music, notably jazz, blues, and rock. As the notation suggests, the proper performance of *scoops* and *fall-offs* requires that the portamento begins (in scoops) or ends (in fall-offs) with the slide itself, rather than with a specific note.
 

@@ -1,7 +1,7 @@
 import { arrowLine, drawIntervalRows, drawNamedStaff, drawStave, melody, noteX, placeNotes } from '../figure-helpers.mjs';
 
-function staveNote(VF, keys, duration = 'w', accidentals = []) {
-  const note = new VF.StaveNote({ keys: Array.isArray(keys) ? keys : [keys], duration });
+function staveNote(VF, keys, duration = 'w', accidentals = [], clef = 'treble') {
+  const note = new VF.StaveNote({ keys: Array.isArray(keys) ? keys : [keys], duration, clef });
   accidentals.forEach((accidental, index) => {
     if (accidental) note.addModifier(new VF.Accidental(accidental), index);
   });
@@ -117,7 +117,7 @@ export const definitions = [
       const treble = new VF.Stave(460, 55, 465).addClef('treble');
       bass.setContext(context).draw();
       treble.setContext(context).draw();
-      const low = ['c/1', 'c/2', 'c/3'].map((key) => staveNote(VF, key));
+      const low = ['c/1', 'c/2', 'c/3'].map((key) => staveNote(VF, key, 'w', [], 'bass'));
       const high = ['c/4', 'c/5', 'c/6'].map((key) => staveNote(VF, key));
       drawVoice(VF, context, bass, low, 260);
       drawVoice(VF, context, treble, high, 320);

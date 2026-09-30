@@ -36,6 +36,6 @@ When multiple simultaneous rhythms are written on the same staff, rests may be u
 
 The normal rule in common notation is that, for any line of music, the notes and rests in each measure must \"add up\" to exactly the amount in the [time signature](ch-08-time-signature.md), no more and no less. For example, in 3/4 time, a measure can have any combination of notes and rests that is the same length as three quarter notes. There is only one common exception to this rule. As a simplifying shorthand, a completely silent measure can simply have a whole rest. In this case, \"whole rest\" does not necessarily mean \"rest for the same length of time as a whole note\"; it means \"rest for the entire measure\".
 
-![Whole rests filling complete measures in both six-eight and two-four time.](../images/notation/whole-rest-full-measure.svg)
+![A whole rest fills a complete measure in six-eight time; in two-four time, two quarter notes (G and C) are followed by a measure with a whole rest.](../images/notation/whole-rest-full-measure.svg)
 
 A whole rest may be used to indicate a completely silent measure, no matter what the actual length of the measure will be.

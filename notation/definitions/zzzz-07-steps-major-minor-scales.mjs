@@ -143,9 +143,9 @@ function drawMinorPatternDiagram(overlay) {
   labelUnder(overlay, ['W', 'H', 'W', 'W', 'H', 'W', 'W'], 290, 66, 40, { 'font-size': 19 });
   overlay.text('Major Scale Pattern:', 35, 98, { 'font-size': 19 });
   labelUnder(overlay, ['W', 'W', 'H', 'W', 'W', 'W', 'H'], 356, 66, 98, { 'font-size': 19 });
-  annotationArc(overlay, 273, 326, 48, '');
-  annotationArc(overlay, 735, 788, 106, '');
-  overlay.path('M 270 87 Q 245 115 295 124 Q 515 168 735 112', {
+  annotationArc(overlay, 273, 373, 48, '');
+  annotationArc(overlay, 672, 768, 106, '');
+  overlay.path('M 270 87 Q 245 115 295 124 Q 500 168 690 112', {
     fill: 'none', stroke: RED, 'stroke-width': 2, 'marker-end': 'url(#arrow)',
   });
   overlay.text('W = Whole\nStep', 85, 164, { 'font-size': 17, 'text-anchor': 'middle', 'data-line-height': 19 });
@@ -153,13 +153,21 @@ function drawMinorPatternDiagram(overlay) {
 }
 
 function drawTune(VF, context, overlay, { key, lines }) {
-  lines.forEach((notes, index) => {
+  // Each line is [measure, ...]; bars are single, with a double bar after the second measure and at the end of line 1.
+  lines.forEach((measures, index) => {
     const y = 30 + index * 175;
+    const notes = [];
+    const firstNotes = [];
+    measures.forEach((measure, m) => {
+      firstNotes.push(notes.length);
+      notes.push(...measure);
+      if (m < measures.length - 1) notes.push({ bar: m === 1 ? 'double' : 'single' });
+    });
     const result = drawStave(VF, context, {
       x: 30, y, width: 920, clef: 'treble', key, time: index === 0 ? '6/8' : undefined,
-      notes, formatWidth: 755, beams: true,
+      notes, formatWidth: 755, beams: { groups: [new VF.Fraction(3, 8)] }, endBar: index === 0 ? 'double' : 'end',
     });
-    [1, 2, 3, 4].forEach((number, measure) => overlay.text(String(number), 190 + measure * 205, y - 2, {
+    [0, 2].forEach((measure, n) => overlay.text(String(index * 2 + n + 1), noteX(result.notes[firstNotes[measure]]) - 6, y - 2, {
       'font-size': 16, 'font-weight': '700', 'text-anchor': 'middle',
     }));
     return result;
@@ -254,7 +262,7 @@ export const definitions = [
     width: 900, height: 210,
     render({ VF, context, overlay }) {
       const pairs = [[pitch('c/4'), pitch('c/4', '#')], [pitch('e/4'), pitch('f/4')], [pitch('g/4', '#'), pitch('a/4')]];
-      pairs.forEach((notes, index) => drawStave(VF, context, { x: 30 + index * 285, y: 35, width: 285, clef: index ? null : 'treble', time: index ? undefined : '4/4', notes, formatWidth: index ? 175 : 125 }));
+      pairs.forEach((notes, index) => drawStave(VF, context, { x: 30 + index * 285, y: 35, width: 285, clef: index ? null : 'treble', time: index ? undefined : '8/4', notes, formatWidth: index ? 175 : 125 }));
       labelUnder(overlay, ['C\u2013C\u266f', 'E\u2013F', 'G\u266f\u2013A'], 165, 285, 175, { 'font-size': 16 });
     },
   },
@@ -292,7 +300,7 @@ export const definitions = [
     width: 900, height: 210,
     render({ VF, context, overlay }) {
       const pairs = [[pitch('c/4'), pitch('d/4')], [pitch('e/4'), pitch('f/4', '#')], [pitch('g/4', '#'), pitch('a/4', '#')]];
-      pairs.forEach((notes, index) => drawStave(VF, context, { x: 30 + index * 285, y: 35, width: 285, clef: index ? null : 'treble', time: index ? undefined : '4/4', notes, formatWidth: index ? 175 : 125 }));
+      pairs.forEach((notes, index) => drawStave(VF, context, { x: 30 + index * 285, y: 35, width: 285, clef: index ? null : 'treble', time: index ? undefined : '8/4', notes, formatWidth: index ? 175 : 125 }));
       labelUnder(overlay, ['C\u2013D', 'E\u2013F\u266f', 'G\u266f\u2013A\u266f'], 165, 285, 175, { 'font-size': 16 });
     },
   },
@@ -461,9 +469,11 @@ export const definitions = [
     alt: 'Row, Row, Row Your Boat notated in G major on two six-eight staves.',
     width: 980, height: 365,
     render({ VF, context, overlay }) {
+      const dq = (key) => note(VF, { key, dots: 1 });
+      const e = (key) => ({ key, duration: '8' });
       drawTune(VF, context, overlay, { key: 'G', lines: [
-        [note(VF, { key: 'g/4', dots: 1 }), note(VF, { key: 'g/4', dots: 1 }), { key: 'g/4' }, { key: 'a/4', duration: '8' }, note(VF, { key: 'b/4', dots: 1 }), { key: 'b/4' }, { key: 'a/4', duration: '8' }, { key: 'b/4' }, { key: 'c/5', duration: '8' }, note(VF, { key: 'd/5', duration: 'h', dots: 1 })],
-        [...Array.from({ length: 3 }, () => ({ key: 'g/5', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'd/5', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'b/4', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'g/4', duration: '8' })), { key: 'd/5' }, { key: 'c/5', duration: '8' }, note(VF, { key: 'b/4', dots: 1 })],
+        [[dq('g/4'), dq('g/4')], [{ key: 'g/4' }, e('a/4'), dq('b/4')], [{ key: 'b/4' }, e('a/4'), { key: 'b/4' }, e('c/5')], [note(VF, { key: 'd/5', duration: 'h', dots: 1 })]],
+        [['g/5', 'g/5', 'g/5', 'd/5', 'd/5', 'd/5'].map(e), ['b/4', 'b/4', 'b/4', 'g/4', 'g/4', 'g/4'].map(e), [{ key: 'd/5' }, e('c/5'), { key: 'b/4' }, e('a/4')], [note(VF, { key: 'g/4', duration: 'h', dots: 1 })]],
       ] });
     },
   },
@@ -474,9 +484,11 @@ export const definitions = [
     alt: 'Row, Row, Row Your Boat transposed to D major on two six-eight staves.',
     width: 980, height: 365,
     render({ VF, context, overlay }) {
+      const dq = (key) => note(VF, { key, dots: 1 });
+      const e = (key) => ({ key, duration: '8' });
       drawTune(VF, context, overlay, { key: 'D', lines: [
-        [note(VF, { key: 'd/4', dots: 1 }), note(VF, { key: 'd/4', dots: 1 }), { key: 'd/4' }, { key: 'e/4', duration: '8' }, note(VF, { key: 'f/4', dots: 1 }), { key: 'f/4' }, { key: 'e/4', duration: '8' }, { key: 'f/4' }, { key: 'g/4', duration: '8' }, note(VF, { key: 'a/4', duration: 'h', dots: 1 })],
-        [...Array.from({ length: 3 }, () => ({ key: 'd/5', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'a/4', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'f/4', duration: '8' })), ...Array.from({ length: 3 }, () => ({ key: 'd/4', duration: '8' })), { key: 'a/4' }, { key: 'g/4', duration: '8' }, note(VF, { key: 'f/4', dots: 1 })],
+        [[dq('d/4'), dq('d/4')], [{ key: 'd/4' }, e('e/4'), dq('f/4')], [{ key: 'f/4' }, e('e/4'), { key: 'f/4' }, e('g/4')], [note(VF, { key: 'a/4', duration: 'h', dots: 1 })]],
+        [['d/5', 'd/5', 'd/5', 'a/4', 'a/4', 'a/4'].map(e), ['f/4', 'f/4', 'f/4', 'd/4', 'd/4', 'd/4'].map(e), [{ key: 'a/4' }, e('g/4'), { key: 'f/4' }, e('e/4')], [note(VF, { key: 'd/4', duration: 'h', dots: 1 })]],
       ] });
     },
   },
@@ -484,12 +496,12 @@ export const definitions = [
     id: 'natural-minor-scale-step-pattern-examples',
     sources: ['2777c8f46803b9ecab65f8d81f77ad2050678285.png'],
     output: 'natural-minor-scale-step-pattern-examples.svg', status: 'vexflow-overlay',
-    alt: 'C minor, G minor, and B minor scales illustrating the whole-half-whole-whole-half-whole-whole pattern.',
+    alt: 'C minor, D minor, and B minor scales illustrating the whole-half-whole-whole-half-whole-whole pattern.',
     width: 850, height: 520,
     render({ VF, context, overlay }) {
       const labels = ['Whole\nStep', 'Half\nStep', 'Whole\nStep', 'Whole\nStep', 'Half\nStep', 'Whole\nStep', 'Whole\nStep'];
       drawPatternScale(VF, context, overlay, { y: 15, notes: scale(['c/4', 'd/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5'], { 2: 'b', 5: 'b', 6: 'b' }), labels });
-      drawPatternScale(VF, context, overlay, { y: 180, notes: scale(['g/4', 'a/4', 'b/4', 'c/5', 'd/5', 'e/5', 'f/5', 'g/5'], { 2: 'b', 5: 'b' }), labels: ['W', 'H', 'W', 'W', 'H', 'W', 'W'] });
+      drawPatternScale(VF, context, overlay, { y: 180, notes: scale(['d/4', 'e/4', 'f/4', 'g/4', 'a/4', 'b/4', 'c/5', 'd/5'], { 5: 'b' }), labels: ['W', 'H', 'W', 'W', 'H', 'W', 'W'] });
       drawPatternScale(VF, context, overlay, { y: 345, clef: 'bass', notes: scale(['b/2', 'c/3', 'd/3', 'e/3', 'f/3', 'g/3', 'a/3', 'b/3'], { 1: '#', 4: '#' }), labels: [] });
     },
   },

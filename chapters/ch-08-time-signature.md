@@ -12,7 +12,7 @@ source: "https://github.com/cnx-user-books/cnxbook-understanding-basic-music-the
 
 In [common notation](ch-01-the-staff.md), the *time signature* appears at the beginning of a piece of music, right after the [key signature](ch-04-key-signature.md). Unlike the key signature, which is on every [staff](ch-01-the-staff.md), the time signature will not appear again in the music unless the meter changes. The [meter](ch-09-meter.md) of a piece is a repetitive rhythmic pulse that underlies the music. The time signature is the symbol that tells you what meter is being used in a piece of music and what [types of note](ch-06-duration-note-lengths-in-written-music.md)) are being used to write it out.
 
-![A treble clef followed by a three-sharp key signature and a four-four time signature.](../images/notation/signature-order.svg)
+![A treble clef followed by a two-sharp key signature and a three-four time signature.](../images/notation/signature-order.svg)
 
 The time signature appears at the beginning of the piece of music, right after the clef symbol and key signature.
 

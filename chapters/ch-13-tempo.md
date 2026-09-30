@@ -16,7 +16,7 @@ The *tempo* of a piece of music is its speed. There are two ways to specify a te
 
 Metronome markings are given in beats per minute. They can be estimated using a clock with a second hand, but the easiest way to find them is with a *metronome*, which is a tool that can give a beat-per-minute tempo as a clicking sound or a pulse of light. the referenced item shows some examples of metronome markings.
 
-![Examples showing how tempo markings combine with four-four, cut, six-eight, and six-sixteen time.](../images/notation/tempo-and-meter-examples.svg)
+![Examples showing how tempo markings combine with four-four, cut, and six-eight time.](../images/notation/tempo-and-meter-examples.svg)
 
 Metronomes often come with other tempo indications written on them, but this is misleading. For example, a metronome may have allegro marked at 120 beats per minute and andante marked at 80 beats per minute. Allegro should certainly be quite a bit faster than andante, but it may not be exactly 120 beats per minute.
 
