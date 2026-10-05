@@ -26,6 +26,15 @@ project:
     headings: true
     figure: true
     table: true
+  # Remote hosts often answer 403, 404, or 5xx to the CI checker even when the
+  # page is fine in a browser. Internal links and missing files still fail.
+  error_rules:
+    - rule: link-resolves
+      severity: ignore
+      keys:
+        - "{http,https}://**"
+    - rule: doi-link-valid
+      severity: ignore
   toc:
     - file: index.md
     - file: front/introduction.md
